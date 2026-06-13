@@ -2,16 +2,9 @@
 # This file defines the build projects and deployment configs for the organization.
 
 projects:
-  # Example Build Project
-  # - name: example-app
-  #   path: ./build/example-app
-  #   tags: ["latest", "v1.0.0"]
-  #   context: .
-  
-  # Example Image Reference
-  # - name: personal-alpine
-  #   path: ./images/alpine-custom
-  #   description: "Custom alpine image with basic tools"
+  - name: FlareSolverr
+    source_url: https://github.com/FlareSolverr/FlareSolverr.git
+    branch: master
 
 containers:
   # Deployment definitions

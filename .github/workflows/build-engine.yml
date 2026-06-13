@@ -26,6 +26,28 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.SYNC_TOKEN }}
 
+      - name: Clone External Projects
+        run: |
+          if [ -f "manifest.yaml" ]; then
+            echo "Processing manifest.yaml for external sources..."
+            # Get count of projects
+            COUNT=$(yq '.projects | length' manifest.yaml)
+            for ((i=0; i<COUNT; i++)); do
+              NAME=$(yq ".projects[$i].name" manifest.yaml)
+              URL=$(yq ".projects[$i].source_url" manifest.yaml)
+              BRANCH=$(yq ".projects[$i].branch // \"main\"" manifest.yaml)
+              
+              if [ "$URL" != "null" ]; then
+                echo "Cloning $NAME from $URL ($BRANCH)..."
+                mkdir -p build
+                git clone --depth 1 --branch "$BRANCH" "$URL" "build/$NAME" || {
+                  # Fallback to master if main fails
+                  git clone --depth 1 --branch "master" "$URL" "build/$NAME" || echo "Failed to clone $NAME"
+                }
+              fi
+            done
+          fi
+
       - name: Build and Push Projects
         run: |
           # 1. Build everything in ./build/ automatically if it has a Dockerfile
@@ -36,8 +58,8 @@ jobs:
                 IMAGE_NAME="ghcr.io/rpdevs-vault/$PROJECT_NAME"
                 
                 echo "Building project: $PROJECT_NAME..."
-                docker build -t "$IMAGE_NAME:latest" "$dir"
-                docker push "$IMAGE_NAME:latest"
+                docker build -t "${IMAGE_NAME,,}:latest" "$dir"
+                docker push "${IMAGE_NAME,,}:latest"
               fi
             done
           fi
@@ -50,8 +72,8 @@ jobs:
                 IMAGE_NAME="ghcr.io/rpdevs-vault/personal-$IMAGE_BASE"
                 
                 echo "Building personal image: $IMAGE_BASE..."
-                docker build -t "$IMAGE_NAME:latest" "$dir"
-                docker push "$IMAGE_NAME:latest"
+                docker build -t "${IMAGE_NAME,,}:latest" "$dir"
+                docker push "${IMAGE_NAME,,}:latest"
               fi
             done
           fi
