@@ -66,14 +66,12 @@ jobs:
 
               # Create README.md for the container project
               IMAGE_NAME="ghcr.io/rpdevs-vault/${REPO_CLEAN,,}"
-              cat << EOF > "$TARGET_DIR/README.md"
-# 📦 $REPO_CLEAN
-
-- **Source Repo:** [\`$repo\`](https://github.com/$repo)
-- **Image:** \`$IMAGE_NAME:latest\`
-- **Command:** See [\`command.txt\`](./command.txt)
-- **Note:** Discovered automatically. To build, move files to \`./build/$REPO_CLEAN/\` or add to \`manifest.yaml\`.
-EOF
+              echo "# 📦 $REPO_CLEAN" > "$TARGET_DIR/README.md"
+              echo "" >> "$TARGET_DIR/README.md"
+              echo "- **Source Repo:** [\`$repo\`](https://github.com/$repo)" >> "$TARGET_DIR/README.md"
+              echo "- **Image:** \`$IMAGE_NAME:latest\`" >> "$TARGET_DIR/README.md"
+              echo "- **Command:** See [\`command.txt\`](./command.txt)" >> "$TARGET_DIR/README.md"
+              echo "- **Note:** Discovered automatically. To build, move files to \`./build/$REPO_CLEAN/\` or add to \`manifest.yaml\`." >> "$TARGET_DIR/README.md"
             fi
           done
 

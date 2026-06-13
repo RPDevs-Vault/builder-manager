@@ -41,7 +41,7 @@ jobs:
 
   build:
     needs: setup-matrix
-    if: needs.setup-matrix.outputs.matrix != '[]'
+    if: needs.setup-matrix.outputs.matrix != '[]' && needs.setup-matrix.outputs.matrix != ''
     strategy:
       fail-fast: false
       matrix: 
@@ -127,7 +127,7 @@ jobs:
 
   build-fallback:
     needs: [setup-matrix, build]
-    if: failure() || cancelled()
+    if: always() && needs.setup-matrix.outputs.matrix != '[]' && needs.setup-matrix.outputs.matrix != '' && (needs.build.result == 'failure' || needs.build.result == 'cancelled')
     strategy:
       fail-fast: false
       matrix: 
