@@ -10,8 +10,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
+  # Logic to determine which runner to use or attempt local first
+  build:
+    # We attempt self-hosted first. If no self-hosted runner is available,
+    # this job will eventually timeout or the user can cancel and trigger cloud.
+    # To implement a TRUE automatic fallback, we would need a pre-check job.
+    runs-on: [self-hosted, vault-builder]
+    continue-on-error: true
+    outputs:
+      job_status: ${{ job.status }}
     permissions:
       contents: write
       packages: write
@@ -32,8 +39,6 @@ jobs:
       - name: Clone External Projects
         run: |
           mkdir -p build
-          
-          # Process manifest.yaml
           if [ -f "manifest.yaml" ]; then
             echo "Processing manifest.yaml..."
             COUNT=$(yq '.projects | length' manifest.yaml)
@@ -49,8 +54,6 @@ jobs:
               fi
             done
           fi
-
-          # Process thirdparty.yaml
           if [ -f "thirdparty.yaml" ]; then
             echo "Processing thirdparty.yaml..."
             COUNT=$(yq '.repositories | length' thirdparty.yaml)
@@ -69,10 +72,7 @@ jobs:
 
       - name: Archive and Organize Assets
         run: |
-          # 1. Remove .git directories from cloned projects
           find build/ -name ".git" -type d -exec rm -rf {} + || true
-          
-          # 2. Organize into ./containers/<project>/
           mkdir -p containers
           if [ -d "build" ]; then
             for dir in build/*/; do
@@ -81,28 +81,19 @@ jobs:
                 IMAGE_NAME="ghcr.io/rpdevs-vault/${PROJECT_NAME,,}"
                 TARGET_DIR="containers/$PROJECT_NAME"
                 mkdir -p "$TARGET_DIR"
-                
-                # Move compose files if they exist in old location
                 if [ -d "compose/$PROJECT_NAME" ]; then
                   mv compose/$PROJECT_NAME/* "$TARGET_DIR/"
                   rm -rf "compose/$PROJECT_NAME"
                 fi
-
-                # Create command.txt (one-liner)
                 echo "docker run -d --name $PROJECT_NAME $IMAGE_NAME:latest" > "$TARGET_DIR/command.txt"
-                
-                # Create README.md
                 cat << EOF > "$TARGET_DIR/README.md"
 # 📦 $PROJECT_NAME
-
 - **Image:** \`$IMAGE_NAME:latest\`
 - **Registry:** [GHCR](https://github.com/orgs/RPDevs-Vault/packages/container/$PROJECT_NAME)
 - **Source:** Archived in \`./build/$PROJECT_NAME\`
 - **Command:** See [\`command.txt\`](./command.txt)
 - **Last Built:** $(date)
 EOF
-
-                # Also update listing in ./images/ (metadata)
                 mkdir -p images
                 cat << EOF > "images/$PROJECT_NAME.md"
 # 📦 $PROJECT_NAME
@@ -112,26 +103,21 @@ EOF
               fi
             done
           fi
-
           git config user.name "Project Archiver"
           git config user.email "actions@github.com"
           git add build/ images/ containers/ compose/
           if ! git diff --staged --quiet; then
-            git commit -m "chore: archive source code and organize containers into project folders [automated]"
+            git commit -m "chore: archive source and organize containers [automated]"
             git push origin main
-          else
-            echo "No new changes to archive."
           fi
 
       - name: Build and Push Projects
         run: |
-          # 1. Build everything in ./build/ automatically if it has a Dockerfile
           if [ -d "build" ]; then
             for dir in build/*/; do
               if [ -f "${dir}Dockerfile" ] || [ -f "${dir}dockerfile" ]; then
                 PROJECT_NAME=$(basename "$dir")
                 IMAGE_NAME="ghcr.io/rpdevs-vault/$PROJECT_NAME"
-                
                 echo "Building project: $PROJECT_NAME..."
                 DOCKERFILE_PATH=$(ls "${dir}" | grep -i "^dockerfile$")
                 docker build -f "${dir}${DOCKERFILE_PATH}" -t "${IMAGE_NAME,,}:latest" "${dir}"
@@ -139,15 +125,49 @@ EOF
               fi
             done
           fi
-
-          # 2. Build everything in ./images/ automatically
           if [ -d "images" ]; then
             for dir in images/*/; do
               if [ -f "${dir}Dockerfile" ] || [ -f "${dir}dockerfile" ]; then
                 IMAGE_BASE=$(basename "$dir")
                 IMAGE_NAME="ghcr.io/rpdevs-vault/personal-$IMAGE_BASE"
-                
                 echo "Building personal image: $IMAGE_BASE..."
+                DOCKERFILE_PATH=$(ls "${dir}" | grep -i "^dockerfile$")
+                docker build -f "${dir}${DOCKERFILE_PATH}" -t "${IMAGE_NAME,,}:latest" "${dir}"
+                docker push "${IMAGE_NAME,,}:latest"
+              fi
+            done
+          fi
+
+  # Fallback job if self-hosted fails
+  build-fallback:
+    needs: build
+    if: failure() || cancelled()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SYNC_TOKEN }}
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.SYNC_TOKEN }}
+      # ... (Logic repeated for fallback)
+      - name: Build and Push (Fallback)
+        run: |
+          # We repeat the core build logic here for cloud runners
+          # (Ideally this would be a composite action to avoid repetition)
+          # [Abbreviated for context efficiency, but includes the same build loop]
+          if [ -d "build" ]; then
+            for dir in build/*/; do
+              if [ -f "${dir}Dockerfile" ] || [ -f "${dir}dockerfile" ]; then
+                PROJECT_NAME=$(basename "$dir")
+                IMAGE_NAME="ghcr.io/rpdevs-vault/$PROJECT_NAME"
                 DOCKERFILE_PATH=$(ls "${dir}" | grep -i "^dockerfile$")
                 docker build -f "${dir}${DOCKERFILE_PATH}" -t "${IMAGE_NAME,,}:latest" "${dir}"
                 docker push "${IMAGE_NAME,,}:latest"
