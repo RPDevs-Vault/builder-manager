@@ -1,0 +1,25 @@
+services:
+  proxy:
+    image: caddy
+    ports: ["80:80"]
+    volumes: ["./Caddyfile:/etc/caddy/Caddyfile"]
+    depends_on: [api, ui]
+  api:
+    build: ../otaku-api
+    environment:
+      - OTAKU_DATABASE_URL=sqlite:///./otaku.db
+      - OTAKU_REDIS_URL=redis://redis:6379/0
+    depends_on: [redis]
+  worker:
+    build: ../otaku-api
+    command: rq worker otaku --with-scheduler
+    environment:
+      - OTAKU_REDIS_URL=redis://redis:6379/0
+    depends_on: [redis]
+  ui:
+    build: ../otaku-ui
+    environment:
+      - OTAKU_API_BASE_URL=http://api:8000
+    depends_on: [api]
+  redis:
+    image: redis:7
