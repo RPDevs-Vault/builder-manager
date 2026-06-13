@@ -36,7 +36,7 @@ jobs:
           THIRDPARTY_JSON=$(yq -o=json -c '.repositories // []' thirdparty.yaml | jq -c 'map(. + {source: "thirdparty", dir: "build/" + .name})')
 
           # Merge all into a single array
-          FULL_MATRIX=$(echo "$LOCAL_JSON $RUNNER_JSON $MANIFEST_JSON $THIRDPARTY_JSON" | jq -s -c 'add')
+          FULL_MATRIX=$(echo "$LOCAL_JSON $RUNNER_JSON $MANIFEST_JSON $THIRDPARTY_JSON" | jq -s -c 'add | if length == 0 then [{"name":"dummy","source":"dummy","dir":"dummy"}] else . end')
           echo "matrix=$FULL_MATRIX" >> $GITHUB_OUTPUT
 
   build:
@@ -66,6 +66,7 @@ jobs:
 
       - name: Prepare Source
         run: |
+          if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
           NAME="${{ matrix.project.name }}"
           DIR="${{ matrix.project.dir }}"
           URL="${{ matrix.project.source_url || matrix.project.url }}"
@@ -81,6 +82,7 @@ jobs:
 
       - name: Archive and Organize
         run: |
+          if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
           NAME="${{ matrix.project.name }}"
           DIR="${{ matrix.project.dir }}"
           
@@ -114,6 +116,7 @@ jobs:
 
       - name: Build and Push
         run: |
+          if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
           NAME="${{ matrix.project.name }}"
           DIR="${{ matrix.project.dir }}"
           IMAGE_NAME="ghcr.io/rpdevs-vault/${NAME,,}"
@@ -146,6 +149,7 @@ jobs:
           password: ${{ secrets.SYNC_TOKEN }}
       - name: Build and Push (Cloud Fallback)
         run: |
+          if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
           NAME="${{ matrix.project.name }}"
           DIR="${{ matrix.project.dir }}"
           IMAGE_NAME="ghcr.io/rpdevs-vault/${NAME,,}"
