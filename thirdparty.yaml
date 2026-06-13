@@ -1,5 +1,0 @@
-# List of third-party repositories to mirror and build
-repositories:
-  - name: mega-embed-2
-    url: https://bitbucket.org/geordilaforge/mega-embed-2.git
-    branch: main

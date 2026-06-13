@@ -49,11 +49,8 @@ jobs:
           # 3. Collect manifest projects
           MANIFEST_JSON=$(yq -o=json -c '.projects // []' manifest.yaml | jq -c 'map(. + {source: "manifest", dir: "build/\(.name)"})')
           
-          # 4. Collect thirdparty projects
-          THIRDPARTY_JSON=$(yq -o=json -c '.repositories // []' thirdparty.yaml | jq -c 'map(. + {source: "thirdparty", dir: "build/\(.name)"})')
-
-          # Merge all into a single array
-          FULL_MATRIX=$(echo "$LOCAL_JSON $RUNNER_JSON $MANIFEST_JSON $THIRDPARTY_JSON" | jq -s -c 'add | if length == 0 then [{"name":"dummy","source":"dummy","dir":"dummy"}] else . end')
+          # Merge all into a single array and ensure unique projects by name
+          FULL_MATRIX=$(echo "$LOCAL_JSON $RUNNER_JSON $MANIFEST_JSON" | jq -s -c 'add | unique_by(.name) | if length == 0 then [{"name":"dummy","source":"dummy","dir":"dummy"}] else . end')
           echo "matrix=$FULL_MATRIX" >> $GITHUB_OUTPUT
 
   build:
@@ -158,7 +155,11 @@ jobs:
           if [ -f "$DIR/Dockerfile" ] || [ -f "$DIR/dockerfile" ]; then
             echo "Building $NAME..."
             DOCKERFILE=$(ls "$DIR" | grep -i "^dockerfile$" | head -n 1)
-            docker buildx build --platform linux/amd64,linux/arm64 -f "$DIR/$DOCKERFILE" -t "$IMAGE_NAME:latest" --push "$DIR"
+            
+            # Extract platforms from manifest or default to amd64,arm64
+            PLATFORMS="${{ matrix.project.platforms && join(matrix.project.platforms, ',') || 'linux/amd64,linux/arm64' }}"
+            
+            docker buildx build --platform "$PLATFORMS" -f "$DIR/$DOCKERFILE" -t "$IMAGE_NAME:latest" --push "$DIR"
           else
             echo "No Dockerfile found in $DIR. Skipping build."
           fi

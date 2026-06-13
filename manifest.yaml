@@ -5,10 +5,12 @@ projects:
   - name: FlareSolverr
     source_url: https://github.com/FlareSolverr/FlareSolverr.git
     branch: master
+    platforms: [linux/amd64, linux/arm64, linux/arm/v7]
+
+  - name: mega-embed-2
+    source_url: https://bitbucket.org/geordilaforge/mega-embed-2.git
+    branch: main
+    platforms: [linux/amd64, linux/arm64]
 
 containers:
   # Deployment definitions
-  # - name: my-service
-  #   type: compose # or "oneliner"
-  #   file: ./compose/my-service/docker-compose.yml
-  #   oneliner: "docker run -d --name my-service ..."
