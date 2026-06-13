@@ -43,7 +43,6 @@ jobs:
               BRANCH=$(yq ".projects[$i].branch // \"main\"" manifest.yaml)
               if [ "$URL" != "null" ]; then
                 echo "Cloning $NAME from $URL ($BRANCH)..."
-                # Remove existing to ensure fresh copy
                 rm -rf "build/$NAME"
                 git clone --depth 1 --branch "$BRANCH" "$URL" "build/$NAME" || \
                 git clone --depth 1 --branch "master" "$URL" "build/$NAME" || echo "Failed to clone $NAME"
@@ -61,7 +60,6 @@ jobs:
               BRANCH=$(yq ".repositories[$i].branch // \"main\"" thirdparty.yaml)
               if [ "$URL" != "null" ]; then
                 echo "Cloning third-party $NAME from $URL ($BRANCH)..."
-                # Remove existing to ensure fresh copy
                 rm -rf "build/$NAME"
                 git clone --depth 1 --branch "$BRANCH" "$URL" "build/$NAME" || \
                 git clone --depth 1 --branch "master" "$URL" "build/$NAME" || echo "Failed to clone $NAME"
@@ -69,19 +67,38 @@ jobs:
             done
           fi
 
-      - name: Archive Cloned Projects
+      - name: Archive and List Images
         run: |
-          # Remove .git directories to allow committing to this repo as subfolders
+          # Remove .git directories from cloned projects
           find build/ -name ".git" -type d -exec rm -rf {} + || true
           
+          # Create image metadata files in ./images/ for everything in ./build/
+          mkdir -p images
+          if [ -d "build" ]; then
+            for dir in build/*/; do
+              if [ -f "${dir}Dockerfile" ] || [ -f "${dir}dockerfile" ]; then
+                PROJECT_NAME=$(basename "$dir")
+                IMAGE_NAME="ghcr.io/rpdevs-vault/${PROJECT_NAME,,}"
+                cat << EOF > "images/$PROJECT_NAME.md"
+# 📦 $PROJECT_NAME
+
+- **Image:** \`$IMAGE_NAME:latest\`
+- **Registry:** [GHCR](https://github.com/orgs/RPDevs-Vault/packages/container/$PROJECT_NAME)
+- **Source:** Archived in \`./build/$PROJECT_NAME\`
+- **Last Built:** $(date)
+EOF
+              fi
+            done
+          fi
+
           git config user.name "Project Archiver"
           git config user.email "actions@github.com"
-          git add build/
+          git add build/ images/
           if ! git diff --staged --quiet; then
-            git commit -m "chore: archive source code for external projects [automated]"
+            git commit -m "chore: archive source code and update image listing [automated]"
             git push origin main
           else
-            echo "No new source code changes to archive."
+            echo "No new changes to archive."
           fi
 
       - name: Build and Push Projects
