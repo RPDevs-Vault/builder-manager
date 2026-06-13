@@ -1,0 +1,1 @@
+docker run -d --name mega-embed-2 ghcr.io/rpdevs-vault/mega-embed-2:latest
