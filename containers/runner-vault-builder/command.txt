@@ -1,0 +1,1 @@
+docker run -d --name runner-vault-builder ghcr.io/rpdevs-vault/runner-vault-builder:latest
