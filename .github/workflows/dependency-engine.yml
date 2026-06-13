@@ -1,14 +1,14 @@
-name: Depends-as-a-Service (DaaS) Engine
+name: Dependency Build Engine
 
 on:
   push:
     paths:
-      - 'daas/**'
+      - 'dependencies/**'
   workflow_dispatch:
 
 jobs:
   build-kodi-depends:
-    name: Build Kodi Depends (${{ matrix.platform }} - ${{ matrix.host_triplet }})
+    name: Build Kodi Dependencies (${{ matrix.platform }} - ${{ matrix.host_triplet }})
     runs-on: [self-hosted, linux, vault-builder]
     strategy:
       fail-fast: false
@@ -33,41 +33,41 @@ jobs:
           sudo apt-get update || true
           sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre || true
 
-      - name: Build Depends
+      - name: Build Dependencies
         run: |
-          chmod +x daas/kodi/build.sh
-          cd daas/kodi
+          chmod +x dependencies/kodi/build.sh
+          cd dependencies/kodi
           ./build.sh ${{ matrix.platform }} ${{ matrix.host_triplet }} master
 
       - name: Package Toolchain
         run: |
-          cd daas/xbmc-deps
-          tar -czvf ../../kodi-depends-${{ matrix.arch_name }}.tar.gz .
+          cd dependencies/kodi/compiled-artifacts
+          tar -czvf ../../../kodi-dependencies-${{ matrix.arch_name }}.tar.gz .
 
-      - name: Upload DaaS Artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: kodi-depends-${{ matrix.arch_name }}
-          path: kodi-depends-${{ matrix.arch_name }}.tar.gz
+          name: kodi-dependencies-${{ matrix.arch_name }}
+          path: kodi-dependencies-${{ matrix.arch_name }}.tar.gz
           retention-days: 14
 
-  release-daas:
-    name: Publish DaaS Release
+  release-dependencies:
+    name: Publish Dependency Release
     needs: build-kodi-depends
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Download all DaaS Artifacts
+      - name: Download all Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: daas-artifacts
+          path: dependency-artifacts
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: daas-kodi-${{ github.run_number }}
-          name: Kodi Depends Toolchain (Build ${{ github.run_number }})
-          files: daas-artifacts/**/*.tar.gz
+          tag_name: dependencies-${{ github.run_number }}
+          name: Pre-compiled Dependencies (Build ${{ github.run_number }})
+          files: dependency-artifacts/**/*.tar.gz
           draft: false
           prerelease: false
         env:
