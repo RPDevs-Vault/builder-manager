@@ -1,0 +1,74 @@
+name: Depends-as-a-Service (DaaS) Engine
+
+on:
+  push:
+    paths:
+      - 'daas/**'
+  workflow_dispatch:
+
+jobs:
+  build-kodi-depends:
+    name: Build Kodi Depends (${{ matrix.platform }} - ${{ matrix.host_triplet }})
+    runs-on: [self-hosted, linux, vault-builder]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            host_triplet: x86_64-linux-gnu
+            arch_name: linux-x86_64
+          - platform: linux
+            host_triplet: aarch64-linux-gnu
+            arch_name: linux-arm64
+          - platform: android
+            host_triplet: aarch64-linux-android
+            arch_name: android-arm64
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Build Environment
+        run: |
+          sudo apt-get update || true
+          sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre || true
+
+      - name: Build Depends
+        run: |
+          chmod +x daas/kodi/build.sh
+          cd daas/kodi
+          ./build.sh ${{ matrix.platform }} ${{ matrix.host_triplet }} master
+
+      - name: Package Toolchain
+        run: |
+          cd daas/xbmc-deps
+          tar -czvf ../../kodi-depends-${{ matrix.arch_name }}.tar.gz .
+
+      - name: Upload DaaS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kodi-depends-${{ matrix.arch_name }}
+          path: kodi-depends-${{ matrix.arch_name }}.tar.gz
+          retention-days: 14
+
+  release-daas:
+    name: Publish DaaS Release
+    needs: build-kodi-depends
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Download all DaaS Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: daas-artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: daas-kodi-${{ github.run_number }}
+          name: Kodi Depends Toolchain (Build ${{ github.run_number }})
+          files: daas-artifacts/**/*.tar.gz
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.SYNC_TOKEN }}
