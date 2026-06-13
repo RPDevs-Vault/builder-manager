@@ -42,13 +42,13 @@ jobs:
             REPO_CLEAN=$(echo "$repo" | sed 's/\//_/g')
             TARGET_DIR="containers/$REPO_CLEAN"
             
-            FILES=$(gh api "/repos/$repo/contents" --jq '.[] | select(.name == "Dockerfile" or .name == "docker-compose.yml" or .name == "compose.yaml" or .name == "compose.yml") | .name' 2>/dev/null)
+            FILES=$(gh api "/repos/$repo/contents" --jq '.[] | select(.name == "Dockerfile" or .name == "docker-compose.yml" or .name == "compose.yaml" or .name == "compose.yml") | .name' 2>/dev/null || true)
             
             if [[ -n "$FILES" ]]; then
               mkdir -p "$TARGET_DIR"
               
               for file in $FILES; do
-                CONTENT=$(gh api "/repos/$repo/contents/$file" --jq '.content' | base64 -d 2>/dev/null)
+                CONTENT=$(gh api "/repos/$repo/contents/$file" --jq '.content' | base64 -d 2>/dev/null || true)
                 
                 if [[ "$file" == "Dockerfile" ]]; then
                   # ARCHIVE TO CONTAINERS (Prevents auto-build in ./build)
