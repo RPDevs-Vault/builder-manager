@@ -1,5 +1,7 @@
 # 📦 container-manager
 
+### 📦 [Organization Packages](https://github.com/orgs/RPDevs-Vault/packages)
+
 Central hub for managing GitHub Container Registry (GHCR) assets for the **RPDevs Vault** organization.
 
 ## 🏗️ Structure
