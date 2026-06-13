@@ -90,16 +90,18 @@ jobs:
             IMAGE_NAME="ghcr.io/rpdevs-vault/${NAME,,}"
             
             echo "docker run -d --name $NAME $IMAGE_NAME:latest" > "containers/$NAME/command.txt"
-            cat << EOF > "containers/$NAME/README.md"
-# 📦 $NAME
-- **Image:** \`$IMAGE_NAME:latest\`
-- **Type:** ${{ matrix.project.source }}
-- **Registry:** [GHCR](https://github.com/orgs/RPDevs-Vault/packages/container/${NAME,,})
-- **Last Built:** $(date)
-EOF
+            
+            # Create Markdown files without HEREDOC inside loop to prevent YAML parsing issues
+            echo "# 📦 $NAME" > "containers/$NAME/README.md"
+            echo "- **Image:** \`$IMAGE_NAME:latest\`" >> "containers/$NAME/README.md"
+            echo "- **Type:** ${{ matrix.project.source }}" >> "containers/$NAME/README.md"
+            echo "- **Registry:** [GHCR](https://github.com/orgs/RPDevs-Vault/packages/container/${NAME,,})" >> "containers/$NAME/README.md"
+            echo "- **Last Built:** \$(date)" >> "containers/$NAME/README.md"
+
             mkdir -p images
             echo "# 📦 $NAME" > "images/$NAME.md"
             echo "Image: \`$IMAGE_NAME:latest\`" >> "images/$NAME.md"
+            echo "Registry: [GHCR](https://github.com/orgs/RPDevs-Vault/packages/container/${NAME,,})" >> "images/$NAME.md"
 
             git config user.name "Fleet Archiver"
             git config user.email "actions@github.com"
