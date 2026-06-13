@@ -51,16 +51,16 @@ jobs:
                 CONTENT=$(gh api "/repos/$repo/contents/$file" --jq '.content' | base64 -d 2>/dev/null)
                 
                 if [[ "$file" == "Dockerfile" ]]; then
-                  mkdir -p "build/$REPO_CLEAN"
-                  echo "$CONTENT" > "build/$REPO_CLEAN/Dockerfile"
+                  # ARCHIVE TO CONTAINERS (Prevents auto-build in ./build)
+                  echo "$CONTENT" > "$TARGET_DIR/Dockerfile"
                   IMAGE_NAME="ghcr.io/rpdevs-vault/${REPO_CLEAN,,}"
                   echo "docker run -d --name $REPO_CLEAN $IMAGE_NAME:latest" > "$TARGET_DIR/command.txt"
-                  echo "| \`$repo\` | Dockerfile | Collected to \`build/$REPO_CLEAN/\` |" >> discovery_report.md
+                  echo "| \`$repo\` | Dockerfile | Archived to \`$TARGET_DIR/Dockerfile\` |" >> discovery_report.md
                 fi
                 
                 if [[ "$file" == *"compose"* ]]; then
                   echo "$CONTENT" > "$TARGET_DIR/$file"
-                  echo "| \`$repo\` | Compose | Collected to \`$TARGET_DIR/\` |" >> discovery_report.md
+                  echo "| \`$repo\` | Compose | Archived to \`$TARGET_DIR/\` |" >> discovery_report.md
                 fi
               done
 
@@ -72,6 +72,7 @@ jobs:
 - **Source Repo:** [\`$repo\`](https://github.com/$repo)
 - **Image:** \`$IMAGE_NAME:latest\`
 - **Command:** See [\`command.txt\`](./command.txt)
+- **Note:** Discovered automatically. To build, move files to \`./build/$REPO_CLEAN/\` or add to \`manifest.yaml\`.
 EOF
             fi
           done
@@ -79,9 +80,12 @@ EOF
           # Commit changes
           git config user.name "Asset Collector"
           git config user.email "actions@github.com"
-          git add build/ containers/ images/ exclusion_list.md
+          git add containers/ images/ exclusion_list.md
+          # Clean up any residual build folders from previous logic
+          git rm -rf build/*/ 2>/dev/null || true
+          
           if ! git diff --staged --quiet; then
-            git commit -m "feat: automatically collect Docker assets and organize into project folders (User + Org)"
+            git commit -m "feat: archive discovered Docker assets to ./containers to prevent auto-builds"
             git push origin main
           fi
 
