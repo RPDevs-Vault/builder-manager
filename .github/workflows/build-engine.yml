@@ -15,9 +15,23 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
+      runner: ${{ steps.check-runner.outputs.runner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - id: check-runner
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          RUNNER_STATUS=$(gh api /repos/${{ github.repository }}/actions/runners --jq '.runners[] | select(.labels[].name == "vault-builder") | .status' | grep "online" | head -n 1)
+          if [ "$RUNNER_STATUS" == "online" ]; then
+            echo "runner=[\"self-hosted\", \"vault-builder\"]" >> $GITHUB_OUTPUT
+            echo "Selected local vault-builder runner."
+          else
+            echo "runner=\"ubuntu-latest\"" >> $GITHUB_OUTPUT
+            echo "Local runner offline. Falling back to ubuntu-latest."
+          fi
 
       - id: set-matrix
         run: |
@@ -47,9 +61,7 @@ jobs:
       matrix: 
         project: ${{ fromJSON(needs.setup-matrix.outputs.matrix) }}
     
-    # Priority: Self-hosted Vault Builder
-    runs-on: [self-hosted, vault-builder]
-    continue-on-error: true
+    runs-on: ${{ fromJSON(needs.setup-matrix.outputs.runner) }}
     
     steps:
       - name: Checkout
@@ -123,39 +135,6 @@ jobs:
           
           if [ -f "$DIR/Dockerfile" ] || [ -f "$DIR/dockerfile" ]; then
             echo "Building $NAME..."
-            DOCKERFILE=$(ls "$DIR" | grep -i "^dockerfile$" | head -n 1)
-            docker build -f "$DIR/$DOCKERFILE" -t "$IMAGE_NAME:latest" "$DIR"
-            docker push "$IMAGE_NAME:latest"
-          fi
-
-  build-fallback:
-    needs: [setup-matrix, build]
-    if: always() && needs.setup-matrix.outputs.matrix != '[]' && needs.setup-matrix.outputs.matrix != '' && (needs.build.result == 'failure' || needs.build.result == 'cancelled')
-    strategy:
-      fail-fast: false
-      matrix: 
-        project: ${{ fromJSON(needs.setup-matrix.outputs.matrix) }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.SYNC_TOKEN }}
-      - name: Login to GHCR
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.SYNC_TOKEN }}
-      - name: Build and Push (Cloud Fallback)
-        run: |
-          if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
-          NAME="${{ matrix.project.name }}"
-          DIR="${{ matrix.project.dir }}"
-          IMAGE_NAME="ghcr.io/rpdevs-vault/${NAME,,}"
-          
-          if [ -f "$DIR/Dockerfile" ] || [ -f "$DIR/dockerfile" ]; then
-            echo "Building $NAME (Cloud)..."
             DOCKERFILE=$(ls "$DIR" | grep -i "^dockerfile$" | head -n 1)
             docker build -f "$DIR/$DOCKERFILE" -t "$IMAGE_NAME:latest" "$DIR"
             docker push "$IMAGE_NAME:latest"
