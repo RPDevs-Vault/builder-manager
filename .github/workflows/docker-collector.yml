@@ -1,9 +1,9 @@
 name: Docker Collector
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 0 * * 0'
-  workflow_dispatch: {}
 
 jobs:
   collect:
@@ -25,7 +25,7 @@ jobs:
           echo "| Repository | Type | Action Taken |" >> discovery_report.md
           echo "| :--- | :--- | :--- |" >> discovery_report.md
 
-          EXCLUDED="IamRPDev/otaku-api IamRPDev/otaku-ui IamRPDev/llmdata-core IamRPDev/otaku-docker"
+          EXCLUDED_FILE="exclusion_list.md"
 
           # Scan both User and Organization
           REPOS_USER=$(gh repo list IamRPDev --limit 1000 --json nameWithOwner,isArchived --jq '.[] | select(.isArchived == false) | .nameWithOwner')
@@ -33,7 +33,7 @@ jobs:
           REPOS="$REPOS_USER $REPOS_ORG"
 
           for repo in $REPOS; do
-            if [[ $EXCLUDED =~ $repo ]]; then
+            if [ -f "$EXCLUDED_FILE" ] && grep -q "$repo" "$EXCLUDED_FILE"; then
               echo "Skipping excluded repository: $repo"
               continue
             fi
@@ -42,14 +42,12 @@ jobs:
             REPO_CLEAN=$(echo "$repo" | sed 's/\//_/g')
             TARGET_DIR="containers/$REPO_CLEAN"
             
-            # Search for Dockerfiles and Compose files
             FILES=$(gh api "/repos/$repo/contents" --jq '.[] | select(.name == "Dockerfile" or .name == "docker-compose.yml" or .name == "compose.yaml" or .name == "compose.yml") | .name' 2>/dev/null)
             
             if [[ -n "$FILES" ]]; then
               mkdir -p "$TARGET_DIR"
               
               for file in $FILES; do
-                # Download the file
                 CONTENT=$(gh api "/repos/$repo/contents/$file" --jq '.content' | base64 -d 2>/dev/null)
                 
                 if [[ "$file" == "Dockerfile" ]]; then
@@ -81,7 +79,7 @@ EOF
           # Commit changes
           git config user.name "Asset Collector"
           git config user.email "actions@github.com"
-          git add build/ containers/ images/
+          git add build/ containers/ images/ exclusion_list.md
           if ! git diff --staged --quiet; then
             git commit -m "feat: automatically collect Docker assets and organize into project folders (User + Org)"
             git push origin main
