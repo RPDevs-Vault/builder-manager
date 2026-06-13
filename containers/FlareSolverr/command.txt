@@ -1,0 +1,1 @@
+docker run -d --name FlareSolverr ghcr.io/rpdevs-vault/flaresolverr:latest
