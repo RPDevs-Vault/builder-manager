@@ -1,0 +1,1 @@
+docker run -d --name RPDevs-Vault_metube ghcr.io/rpdevs-vault/rpdevs-vault_metube:latest
