@@ -9,7 +9,7 @@ on:
 jobs:
   build-kodi-depends:
     name: Build Kodi Dependencies (${{ matrix.platform }} - ${{ matrix.host_triplet }})
-    runs-on: [self-hosted, linux, heavy]
+    runs-on: [self-hosted, linux, local]
     strategy:
       fail-fast: false
       matrix:

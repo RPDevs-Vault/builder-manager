@@ -22,6 +22,14 @@ cd xbmc/tools/depends
 PREFIX_DIR="$(pwd)/../../../../compiled-artifacts"
 mkdir -p "$PREFIX_DIR"
 
+# Enable ccache if available to speed up compilation
+if command -v ccache >/dev/null 2>&1 && [ -n "$CCACHE_DIR" ]; then
+  echo "Enabling ccache with CCACHE_DIR=$CCACHE_DIR"
+  export CC="ccache gcc"
+  export CXX="ccache g++"
+  ccache -z
+fi
+
 ./bootstrap
 ./configure --prefix="$PREFIX_DIR" --host="$HOST_TRIPLET" --with-platform="$PLATFORM"
 
