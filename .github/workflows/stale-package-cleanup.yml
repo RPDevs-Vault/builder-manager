@@ -1,5 +1,9 @@
 name: Stale Package Cleanup
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   schedule:
     - cron: '0 13 * * 0' # Weekly on Sunday at 13:00

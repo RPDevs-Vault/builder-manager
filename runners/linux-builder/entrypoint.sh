@@ -46,4 +46,11 @@ cleanup() {
 trap 'cleanup; exit 130' INT
 trap 'cleanup; exit 143' TERM
 
+# Dynamic GID mapping for Docker Socket
+if [ -e /var/run/docker.sock ]; then
+    DOCKER_GID=$(stat -c '%g' /var/run/docker.sock)
+    sudo groupadd -g $DOCKER_GID docker_host || true
+    sudo usermod -aG docker_host runner || true
+fi
+
 ./run.sh & wait $!

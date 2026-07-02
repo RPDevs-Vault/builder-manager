@@ -1,5 +1,9 @@
 name: GHCR Global Auditor
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   schedule:
     - cron: '0 0 * * 1' # Weekly on Monday at 00:00
