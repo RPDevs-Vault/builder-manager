@@ -1,0 +1,1 @@
+docker run -d --name IamRPDev_dns-proxy-server ghcr.io/rpdevs-vault/iamrpdev_dns-proxy-server:latest
