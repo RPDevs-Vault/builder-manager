@@ -79,24 +79,19 @@ jobs:
           path: kodi-dependencies-${{ matrix.arch_name }}.tar.gz
           retention-days: 14
 
-  release-dependencies:
-    name: Publish Dependency Release
+  dispatch-to-distributor:
+    name: Dispatch to Distributor
     needs: build-kodi-depends
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Download all Artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
-        with:
-          path: dependency-artifacts
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
-        with:
-          tag_name: dependencies-${{ github.run_number }}
-          name: "Pre-compiled Dependencies (Build ${{ github.run_number }})"
-          files: dependency-artifacts/**/*.tar.gz
-          draft: false
-          prerelease: false
+      - name: Emit Repository Dispatch
         env:
-          GITHUB_TOKEN: ${{ secrets.SYNC_TOKEN }}
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          echo "Dispatching to distributor-manager..."
+          gh api -X POST /repos/RPDevs-Vault/distributor-manager/dispatches \
+            -f event_type='publish_artifact' \
+            -f client_payload[run_id]="${{ github.run_id }}" \
+            -f client_payload[project]="kodi-dependencies"
+          echo "Dispatch emitted successfully."
