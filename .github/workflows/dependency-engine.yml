@@ -5,6 +5,16 @@ on:
     paths:
       - 'dependencies/**'
   workflow_dispatch:
+    inputs:
+      kodi_branch:
+        description: 'Kodi branch to build'
+        required: false
+        default: 'master'
+        type: choice
+        options:
+          - master
+          - Piers
+          - Omega
 
 jobs:
   build-kodi-depends:
@@ -35,15 +45,20 @@ jobs:
 
       - name: Build Dependencies
         id: build_step
+        env:
+          CCACHE_DIR: /mnt/ccache
         run: |
           chmod +x dependencies/kodi/build.sh
           cd dependencies/kodi
-          echo "Starting heavy build. Logging to build.log..."
-          ./build.sh ${{ matrix.platform }} ${{ matrix.host_triplet }} master > build.log 2>&1 || {
+          BRANCH="${{ github.event.inputs.kodi_branch || 'master' }}"
+          echo "Starting build for ${{ matrix.arch_name }} (branch: $BRANCH). Logging to build.log..."
+          ./build.sh ${{ matrix.platform }} ${{ matrix.host_triplet }} "$BRANCH" > build.log 2>&1 || {
+            echo "::error::Build failed. Last 100 lines:"
             tail -n 100 build.log
             exit 1
           }
-          tail -n 100 build.log
+          echo "Build succeeded. Last 50 lines:"
+          tail -n 50 build.log
 
       - name: Upload Build Log on Failure
         if: failure() && steps.build_step.outcome == 'failure'
@@ -79,7 +94,7 @@ jobs:
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: dependencies-${{ github.run_number }}
-          name: Pre-compiled Dependencies (Build ${{ github.run_number }})
+          name: "Pre-compiled Dependencies (Build ${{ github.run_number }})"
           files: dependency-artifacts/**/*.tar.gz
           draft: false
           prerelease: false
