@@ -2,10 +2,11 @@
 
 Welcome to the **container-manager** console. This repository serves as the Tier 2 Compilation Registry and asset builder, responsible for compiling OCI Docker images, hosting our custom builder base images, managing self-hosted runner caching systems, and mirroring packages to the GHCR registry.
 
-* **Tier 0 Global Cockpit:** [github-manager](https://github.com/RPDevs-Vault/github-manager) (Live Health & Fleet Runners)
-* **Tier 1 Governance Hub:** [vault-manager](https://github.com/RPDevs-Vault/vault-manager) (Policies & Dispatching)
-* **Tier 3 Project Roadmap:** [project-manager](https://github.com/RPDevs-Vault/project-manager) (Task & Issue Sync)
-* **Tier 4 Release Gateway:** [distributor-manager](https://github.com/RPDevs-Vault/distributor-manager) (Artifact Distribution)
+* **Tier 0:** [github-manager](https://github.com/RPDevs-Vault/github-manager) | **Tier 0.5:** [monitor-manager](https://github.com/RPDevs-Vault/monitor-manager)
+* **Tier 1:** [vault-manager](https://github.com/RPDevs-Vault/vault-manager) | **Tier 1.5:** [identity-manager](https://github.com/RPDevs-Vault/identity-manager)
+* **Tier 2:** [container-manager](https://github.com/RPDevs-Vault/container-manager) | **Tier 3:** [project-manager](https://github.com/RPDevs-Vault/project-manager)
+* **Tier 4:** [distributor-manager](https://github.com/RPDevs-Vault/distributor-manager) | **Tier 4.5:** [deploy-manager](https://github.com/RPDevs-Vault/deploy-manager)
+* **Tier 5:** [thought-manager](https://github.com/RPDevs-Vault/thought-manager)
 
 ---
 
