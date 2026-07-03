@@ -13,8 +13,10 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     update-ca-certificates
 
-# Create a non-root user for security
-RUN groupadd -g 1000 rpdevs && \
+# Create a non-root user for security (clean up pre-existing user ubuntu with UID 1000 first)
+RUN userdel -r ubuntu || true && \
+    groupdel ubuntu || true && \
+    groupadd -g 1000 rpdevs && \
     useradd -u 1000 -g rpdevs -m -s /bin/bash rpdevs
 
 USER rpdevs
