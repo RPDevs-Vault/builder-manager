@@ -1,8 +1,11 @@
-# 📦 container-manager
+# 📦 Container Manager — Tier 2: Compilation & Fleet Builder
 
-### 📦 [Organization Packages](https://github.com/orgs/RPDevs-Vault/packages)
+Welcome to the **container-manager** console. This repository serves as the Tier 2 Compilation Registry and asset builder, responsible for compiling OCI Docker images, hosting our custom builder base images, managing self-hosted runner caching systems, and mirroring packages to the GHCR registry.
 
-Central hub for managing GitHub Container Registry (GHCR) assets, automatic build flows, and deployment configurations for the **RPDevs Vault** organization.
+* **Global Systems Cockpit:** [github-manager](https://github.com/RPDevs-Vault/github-manager) (Live Health & Fleet Runners)
+* **Active Project Roadmap:** [project-manager](https://github.com/RPDevs-Vault/project-manager) (Task & Issue Sync)
+
+---
 
 ## 🏗️ Structure
 
