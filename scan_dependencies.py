@@ -10,6 +10,12 @@ ORGS = ["RPDevs-Builds", "RPDevs-Vault"]
 GH_TOKEN = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_PAT")
 
 if not GH_TOKEN:
+    import subprocess
+    res = subprocess.run("gh auth token", shell=True, capture_output=True, text=True)
+    if res.returncode == 0:
+        GH_TOKEN = res.stdout.strip()
+
+if not GH_TOKEN:
     print("Error: GH_TOKEN, GITHUB_TOKEN, or GH_PAT environment variable is required.")
     sys.exit(1)
 
