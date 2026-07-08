@@ -15,7 +15,7 @@ jobs:
     - name: Prune Docker Layers
       run: |
         echo "Pruning unused Docker data..."
-        docker system prune -af --volumes --filter "until=168h" # Remove everything older than 7 days
+        docker system prune -af --filter "until=168h" # Remove everything older than 7 days, preserve volumes
 
     - name: Clean Workspace Bloat
       run: |

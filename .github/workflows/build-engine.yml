@@ -39,12 +39,43 @@ jobs:
         GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
       run: |
         RUNNER_STATUS=$(gh api /orgs/RPDevs-Vault/actions/runners --jq '.runners[] | select(.labels[].name == "heavy") | .status' | grep "online" | head -n 1)
-        if [ "$RUNNER_STATUS" == "online" ]; then
-          echo "runner=[\"self-hosted\", \"linux\", \"heavy\"]" >> $GITHUB_OUTPUT
-          echo "Selected local vault-builder runner."
-        else
+        if [ "$RUNNER_STATUS" != "online" ]; then
           echo "runner=\"ubuntu-latest\"" >> $GITHUB_OUTPUT
-          echo "Local runner offline. Falling back to ubuntu-latest."
+          echo "Local heavy runner offline. Falling back to ubuntu-latest."
+          exit 0
+        fi
+
+        # Get last 3 successful runs to evaluate historical duration
+        RUNS=$(gh api /repos/${{ github.repository }}/actions/workflows/build-engine.yml/runs?status=success\&per_page=3)
+        
+        TOTAL_DURATION=0
+        COUNT=0
+        for row in $(echo "${RUNS}" | jq -r '.workflow_runs[] | @base64'); do
+            _jq() {
+             echo ${row} | base64 --decode | jq -r ${1}
+            }
+            CREATED=$(_jq '.created_at')
+            UPDATED=$(_jq '.updated_at')
+            START=$(date -d "$CREATED" +%s)
+            END=$(date -d "$UPDATED" +%s)
+            DUR=$((END - START))
+            TOTAL_DURATION=$((TOTAL_DURATION + DUR))
+            COUNT=$((COUNT + 1))
+        done
+
+        if [ $COUNT -gt 0 ]; then
+          AVG=$((TOTAL_DURATION / COUNT))
+          echo "Average duration of last $COUNT runs: ${AVG}s"
+          if [ $AVG -gt 900 ]; then
+             echo "Average duration > 15m. Escalating to heavy runner."
+             echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"heavy\"]}" >> $GITHUB_OUTPUT
+          else
+             echo "Average duration <= 15m. Routing to lightweight runner."
+             echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"lightweight\"]}" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "No historical data. Defaulting to lightweight runner."
+          echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"lightweight\"]}" >> $GITHUB_OUTPUT
         fi
 
     - id: set-matrix
