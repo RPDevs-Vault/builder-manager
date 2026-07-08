@@ -2,6 +2,6 @@ name: Test Dispatch
 on: [workflow_dispatch]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, lightweight]
     steps:
       - run: echo "Success"

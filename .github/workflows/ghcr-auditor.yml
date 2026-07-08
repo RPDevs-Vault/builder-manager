@@ -11,7 +11,7 @@ on:
 
 jobs:
   audit:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, lightweight]
     steps:
       - name: Audit Organization Packages
         env:

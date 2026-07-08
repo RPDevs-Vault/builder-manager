@@ -11,7 +11,7 @@ on:
 
 jobs:
   cleanup:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, lightweight]
     steps:
       - name: Prune Stale GHCR Images
         env:
