@@ -110,9 +110,9 @@ jobs:
           echo "Waiting for tunnel to initialize..."
           sleep 5
           
-          echo "Mounting NFS Share..."
-          mkdir -p /home/runner/shared
-          sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot/github_runners/shared /home/runner/shared
+          echo "Mounting NFS Cache via Cloudflare Tunnel..."
+          sudo mkdir -p /home/runner/shared
+          sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot /home/runner/shared
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
