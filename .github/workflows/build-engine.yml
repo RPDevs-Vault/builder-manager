@@ -90,6 +90,30 @@ jobs:
             fi
           fi
 
+      - name: Mount Remote NFS Cache via Cloudflare Tunnel
+        if: "!contains(runner.labels, 'self-hosted')"
+        env:
+          CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
+          echo "Installing NFS Common and Cloudflared..."
+          sudo apt-get update && sudo apt-get install -y nfs-common
+          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+          
+          echo "Starting Cloudflare Tunnel mapping..."
+          export TUNNEL_SERVICE_AUTH_ID=$CF_CLIENT_ID
+          export TUNNEL_SERVICE_AUTH_SECRET=$CF_CLIENT_SECRET
+          cloudflared access tcp --hostname nfs-sharedroot.iamrp.dev --url 127.0.0.1:2049 &
+          
+          echo "Waiting for tunnel to initialize..."
+          sleep 5
+          
+          echo "Mounting NFS Share..."
+          mkdir -p /home/runner/shared
+          sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/mnt/sharedroot /home/runner/shared
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
 
