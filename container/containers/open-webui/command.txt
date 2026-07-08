@@ -1,0 +1,1 @@
+docker run -d --name open-webui ghcr.io/rpdevs-vault/open-webui:latest
