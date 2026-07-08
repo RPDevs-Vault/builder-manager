@@ -22,7 +22,7 @@ on:
 jobs:
   build-kodi-depends:
     name: Build Kodi Dependencies (${{ matrix.platform }} - ${{ matrix.host_triplet }})
-    runs-on: [self-hosted, linux, local]
+    runs-on: [self-hosted, linux, heavy]
     strategy:
       fail-fast: false
       matrix:
@@ -49,7 +49,7 @@ jobs:
       - name: Build Dependencies
         id: build_step
         env:
-          CCACHE_DIR: /mnt/ccache
+          CCACHE_DIR: /home/runner/.ccache
         run: |
           chmod +x dependencies/kodi/build.sh
           cd dependencies/kodi

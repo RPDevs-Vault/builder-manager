@@ -66,7 +66,7 @@ jobs:
   build-depends:
     needs: [matrix-prep, check-runner]
     name: Build Depends (${{ matrix.platform }})
-    runs-on: ${{ (matrix.platform == 'osx64' || matrix.platform == 'ios' || matrix.platform == 'tvos') && 'macos-latest' || (matrix.platform == 'win64' && 'windows-2022') || (needs.check-runner.outputs.runner_status == 'online' && fromJSON('["self-hosted", "linux64"]') || 'ubuntu-22.04') }}
+    runs-on: ${{ (matrix.platform == 'osx64' || matrix.platform == 'ios' || matrix.platform == 'tvos') && 'macos-latest' || (matrix.platform == 'win64' && 'windows-2022') || (needs.check-runner.outputs.runner_status == 'online' && fromJSON('["self-hosted", "linux", "heavy"]') || 'ubuntu-22.04') }}
     strategy:
       fail-fast: false
       matrix:
@@ -154,10 +154,10 @@ jobs:
         run: |
           tar -czf depends.tar.gz -C xbmc-deps .
           # If running on our self-hosted infrastructure, also stage it to the shared appdata
-          if [ -d "/home/runner/shared/appdata" ]; then
-             mkdir -p /home/runner/shared/appdata/kodi-depends/${{ matrix.platform }}
-             cp depends.tar.gz /home/runner/shared/appdata/kodi-depends/${{ matrix.platform }}/depends.tar.gz
-             echo "✅ Staged to /home/runner/shared/appdata/kodi-depends/${{ matrix.platform }}/depends.tar.gz"
+          if [ -d "/home/runner/appdata" ]; then
+             mkdir -p /home/runner/appdata/kodi-depends/${{ matrix.platform }}
+             cp depends.tar.gz /home/runner/appdata/kodi-depends/${{ matrix.platform }}/depends.tar.gz
+             echo "✅ Staged to /home/runner/appdata/kodi-depends/${{ matrix.platform }}/depends.tar.gz"
           fi
 
       - name: Upload Artifact

@@ -33,9 +33,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
         run: |
-          RUNNER_STATUS=$(gh api /orgs/RPDevs-Vault/actions/runners --jq '.runners[] | select(.labels[].name == "vault-builder") | .status' | grep "online" | head -n 1)
+          RUNNER_STATUS=$(gh api /orgs/RPDevs-Vault/actions/runners --jq '.runners[] | select(.labels[].name == "heavy") | .status' | grep "online" | head -n 1)
           if [ "$RUNNER_STATUS" == "online" ]; then
-            echo "runner=[\"self-hosted\", \"vault-builder\"]" >> $GITHUB_OUTPUT
+            echo "runner=[\"self-hosted\", \"linux\", \"heavy\"]" >> $GITHUB_OUTPUT
             echo "Selected local vault-builder runner."
           else
             echo "runner=\"ubuntu-latest\"" >> $GITHUB_OUTPUT

@@ -8,7 +8,7 @@ on:
 jobs:
   warmup-npm:
     name: Warm Up NPM Cache
-    runs-on: [self-hosted, linux64]
+    runs-on: [self-hosted, linux, lightweight]
     steps:
       - name: Cache Check
         run: |
@@ -23,7 +23,7 @@ jobs:
 
   warmup-go:
     name: Warm Up Go Cache
-    runs-on: [self-hosted, linux64]
+    runs-on: [self-hosted, linux, lightweight]
     steps:
       - name: Cache Check
         run: |
@@ -37,7 +37,7 @@ jobs:
 
   warmup-rust:
     name: Warm Up Cargo Cache
-    runs-on: [self-hosted, linux64]
+    runs-on: [self-hosted, linux, lightweight]
     steps:
       - name: Cache Check
         run: |
@@ -48,7 +48,7 @@ jobs:
 
   warmup-python:
     name: Warm Up Python Cache
-    runs-on: [self-hosted, linux64]
+    runs-on: [self-hosted, linux, lightweight]
     steps:
       - name: Cache Check
         run: |
