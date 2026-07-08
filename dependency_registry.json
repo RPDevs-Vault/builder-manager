@@ -1,0 +1,3010 @@
+{
+  "RPDevs-Builds/otaku-client-kodi": {
+    "owner": "RPDevs-Builds",
+    "name": "otaku-client-kodi",
+    "html_url": "https://github.com/RPDevs-Builds/otaku-client-kodi",
+    "description": "",
+    "is_fork": false,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Builds/otaku-client-kodi/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Builds/nextdns-firefox-addon": {
+    "owner": "RPDevs-Builds",
+    "name": "nextdns-firefox-addon",
+    "html_url": "https://github.com/RPDevs-Builds/nextdns-firefox-addon",
+    "description": "",
+    "is_fork": false,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Builds/nextdns-firefox-addon/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Builds/blackhole-server": {
+    "owner": "RPDevs-Builds",
+    "name": "blackhole-server",
+    "html_url": "https://github.com/RPDevs-Builds/blackhole-server",
+    "description": "",
+    "is_fork": false,
+    "dependency_files": {
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Builds/blackhole-server/blob/main/go.mod"
+      }
+    }
+  },
+  "RPDevs-Builds/metadata.anime.otaku.python": {
+    "owner": "RPDevs-Builds",
+    "name": "metadata.anime.otaku.python",
+    "html_url": "https://github.com/RPDevs-Builds/metadata.anime.otaku.python",
+    "description": "\u26e9\ufe0f Otaku Anime Scraper for Kodi (`metadata.anime.otaku.python`)",
+    "is_fork": false,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Builds/metadata.anime.otaku.python/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Builds/Otaku-Testing": {
+    "owner": "RPDevs-Builds",
+    "name": "Otaku-Testing",
+    "html_url": "https://github.com/RPDevs-Builds/Otaku-Testing",
+    "description": "Testing Repository for Otaku Development ",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Builds/Otaku-Testing/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Builds/script.service.megacloud": {
+    "owner": "RPDevs-Builds",
+    "name": "script.service.megacloud",
+    "html_url": "https://github.com/RPDevs-Builds/script.service.megacloud",
+    "description": "",
+    "is_fork": false,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Builds/script.service.megacloud/blob/master/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Builds/script.service.flaresolverr": {
+    "owner": "RPDevs-Builds",
+    "name": "script.service.flaresolverr",
+    "html_url": "https://github.com/RPDevs-Builds/script.service.flaresolverr",
+    "description": "",
+    "is_fork": false,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Builds/script.service.flaresolverr/blob/master/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Builds/demo-repository": {
+    "owner": "RPDevs-Builds",
+    "name": "demo-repository",
+    "html_url": "https://github.com/RPDevs-Builds/demo-repository",
+    "description": "A code repository designed to show the best GitHub has to offer.",
+    "is_fork": false,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Builds/demo-repository/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Builds/Otaku-Prod": {
+    "owner": "RPDevs-Builds",
+    "name": "Otaku-Prod",
+    "html_url": "https://github.com/RPDevs-Builds/Otaku-Prod",
+    "description": "Repository for Otaku Development",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Builds/Otaku-Prod/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Builds/script.module.myaccounts": {
+    "owner": "RPDevs-Builds",
+    "name": "script.module.myaccounts",
+    "html_url": "https://github.com/RPDevs-Builds/script.module.myaccounts",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Builds/script.module.myaccounts/blob/master/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/RTLSDR-Airband": {
+    "owner": "RPDevs-Vault",
+    "name": "RTLSDR-Airband",
+    "html_url": "https://github.com/RPDevs-Vault/RTLSDR-Airband",
+    "description": "Multichannel AM/NFM demodulator",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/RTLSDR-Airband/blob/main/CMakeLists.txt"
+      },
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/RTLSDR-Airband/blob/main/Dockerfile"
+      }
+    }
+  },
+  "RPDevs-Vault/skin.fentastic": {
+    "owner": "RPDevs-Vault",
+    "name": "skin.fentastic",
+    "html_url": "https://github.com/RPDevs-Vault/skin.fentastic",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/skin.fentastic/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/openwrt": {
+    "owner": "RPDevs-Vault",
+    "name": "openwrt",
+    "html_url": "https://github.com/RPDevs-Vault/openwrt",
+    "description": "This repository is a mirror of https://git.openwrt.org/openwrt/openwrt.git It is for reference only and is not active for check-ins.  We will continue to accept Pull Requests here. They will be merged via staging trees then into openwrt.git.",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/openwrt/blob/main/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/luci": {
+    "owner": "RPDevs-Vault",
+    "name": "luci",
+    "html_url": "https://github.com/RPDevs-Vault/luci",
+    "description": "LuCI - OpenWrt Configuration Interface",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/luci/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/gcloud_php_netperf": {
+    "owner": "RPDevs-Vault",
+    "name": "gcloud_php_netperf",
+    "html_url": "https://github.com/RPDevs-Vault/gcloud_php_netperf",
+    "description": "cloud project connector",
+    "is_fork": false,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/gcloud_php_netperf/blob/main/Dockerfile"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/gcloud_php_netperf/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/openwrt-configurator": {
+    "owner": "RPDevs-Vault",
+    "name": "openwrt-configurator",
+    "html_url": "https://github.com/RPDevs-Vault/openwrt-configurator",
+    "description": "A CLI to easily provision UCI configuration to OpenWrt devices.",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/openwrt-configurator/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/luci-app-yt-dlp": {
+    "owner": "RPDevs-Vault",
+    "name": "luci-app-yt-dlp",
+    "html_url": "https://github.com/RPDevs-Vault/luci-app-yt-dlp",
+    "description": "luci application for yt-dlp",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/luci-app-yt-dlp/blob/master/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/LiveTerm": {
+    "owner": "RPDevs-Vault",
+    "name": "LiveTerm",
+    "html_url": "https://github.com/RPDevs-Vault/LiveTerm",
+    "description": "\ud83d\udcbb Build terminal styled websites in minutes!",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/LiveTerm/blob/main/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/LiveTerm/blob/main/docker-compose.yml"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/LiveTerm/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/Leans_lede": {
+    "owner": "RPDevs-Vault",
+    "name": "Leans_lede",
+    "html_url": "https://github.com/RPDevs-Vault/Leans_lede",
+    "description": "Lean's LEDE source",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/Leans_lede/blob/master/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/plugin.program.super.favourites": {
+    "owner": "RPDevs-Vault",
+    "name": "plugin.program.super.favourites",
+    "html_url": "https://github.com/RPDevs-Vault/plugin.program.super.favourites",
+    "description": "Kodi plugin",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/plugin.program.super.favourites/blob/master/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/skin.arctic.fuse": {
+    "owner": "RPDevs-Vault",
+    "name": "skin.arctic.fuse",
+    "html_url": "https://github.com/RPDevs-Vault/skin.arctic.fuse",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/skin.arctic.fuse/blob/omega/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/skin.arctic.fuse.2": {
+    "owner": "RPDevs-Vault",
+    "name": "skin.arctic.fuse.2",
+    "html_url": "https://github.com/RPDevs-Vault/skin.arctic.fuse.2",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/skin.arctic.fuse.2/blob/omega/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/swizzin_dashboard": {
+    "owner": "RPDevs-Vault",
+    "name": "swizzin_dashboard",
+    "html_url": "https://github.com/RPDevs-Vault/swizzin_dashboard",
+    "description": "The swizzin web dashboard",
+    "is_fork": true,
+    "dependency_files": {
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/swizzin_dashboard/blob/master/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/comet": {
+    "owner": "RPDevs-Vault",
+    "name": "comet",
+    "html_url": "https://github.com/RPDevs-Vault/comet",
+    "description": "Stremio's fastest torrent/debrid search add-on.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/comet/blob/main/Dockerfile"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/comet/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/netboot.xyz": {
+    "owner": "RPDevs-Vault",
+    "name": "netboot.xyz",
+    "html_url": "https://github.com/RPDevs-Vault/netboot.xyz",
+    "description": "Your favorite operating systems in one place.  A network-based bootable operating system installer based on iPXE.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/netboot.xyz/blob/development/Dockerfile"
+      }
+    }
+  },
+  "RPDevs-Vault/Otaku": {
+    "owner": "RPDevs-Vault",
+    "name": "Otaku",
+    "html_url": "https://github.com/RPDevs-Vault/Otaku",
+    "description": "Repository for Otaku Development",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/Otaku/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/script.nimbus.helper": {
+    "owner": "RPDevs-Vault",
+    "name": "script.nimbus.helper",
+    "html_url": "https://github.com/RPDevs-Vault/script.nimbus.helper",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/script.nimbus.helper/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/hyperion.ng": {
+    "owner": "RPDevs-Vault",
+    "name": "hyperion.ng",
+    "html_url": "https://github.com/RPDevs-Vault/hyperion.ng",
+    "description": "The successor to Hyperion aka Hyperion Next Generation",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/hyperion.ng/blob/master/CMakeLists.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/plugin.program.openwizard": {
+    "owner": "RPDevs-Vault",
+    "name": "plugin.program.openwizard",
+    "html_url": "https://github.com/RPDevs-Vault/plugin.program.openwizard",
+    "description": "OpenWizard is a Kodi maintenance wizard, including cleaning, viewing logs, persisting user data, and even full backup/restore features.",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/plugin.program.openwizard/blob/master/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/skin.pellucid": {
+    "owner": "RPDevs-Vault",
+    "name": "skin.pellucid",
+    "html_url": "https://github.com/RPDevs-Vault/skin.pellucid",
+    "description": "A skin for Kodi by theDeadMan",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/skin.pellucid/blob/master/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/skin.osmc": {
+    "owner": "RPDevs-Vault",
+    "name": "skin.osmc",
+    "html_url": "https://github.com/RPDevs-Vault/skin.osmc",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/skin.osmc/blob/omega/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/EchoCLI": {
+    "owner": "RPDevs-Vault",
+    "name": "EchoCLI",
+    "html_url": "https://github.com/RPDevs-Vault/EchoCLI",
+    "description": " A python command line tool for rooting your Amazon Echo dot 2nd generation ",
+    "is_fork": true,
+    "dependency_files": {
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/EchoCLI/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/immortalwrt": {
+    "owner": "RPDevs-Vault",
+    "name": "immortalwrt",
+    "html_url": "https://github.com/RPDevs-Vault/immortalwrt",
+    "description": "An opensource OpenWrt variant for mainland China users.",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/immortalwrt/blob/master/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/greasemonkey": {
+    "owner": "RPDevs-Vault",
+    "name": "greasemonkey",
+    "html_url": "https://github.com/RPDevs-Vault/greasemonkey",
+    "description": "Greasemonkey is a user script manager for Firefox.",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/greasemonkey/blob/master/Makefile"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/greasemonkey/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/FlareSolverr": {
+    "owner": "RPDevs-Vault",
+    "name": "FlareSolverr",
+    "html_url": "https://github.com/RPDevs-Vault/FlareSolverr",
+    "description": "Proxy server to bypass Cloudflare protection",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/FlareSolverr/blob/master/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/FlareSolverr/blob/master/docker-compose.yml"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/FlareSolverr/blob/master/package.json"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/FlareSolverr/blob/master/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/nextdns": {
+    "owner": "RPDevs-Vault",
+    "name": "nextdns",
+    "html_url": "https://github.com/RPDevs-Vault/nextdns",
+    "description": "NextDNS CLI client (DoH Proxy)",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/nextdns/blob/master/Dockerfile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/nextdns/blob/master/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/TheAnnoyingSite.com": {
+    "owner": "RPDevs-Vault",
+    "name": "TheAnnoyingSite.com",
+    "html_url": "https://github.com/RPDevs-Vault/TheAnnoyingSite.com",
+    "description": "The Annoying Site a.k.a. \"The Power of the Web Platform\"",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/TheAnnoyingSite.com/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/chameleon": {
+    "owner": "RPDevs-Vault",
+    "name": "chameleon",
+    "html_url": "https://github.com/RPDevs-Vault/chameleon",
+    "description": "Chameleon Web Extension (Port of Random Agent Spoofer)",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/chameleon/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/map-of-reddit": {
+    "owner": "RPDevs-Vault",
+    "name": "map-of-reddit",
+    "html_url": "https://github.com/RPDevs-Vault/map-of-reddit",
+    "description": "Interactive map of reddit",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/map-of-reddit/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/mega-embed-2": {
+    "owner": "RPDevs-Vault",
+    "name": "mega-embed-2",
+    "html_url": "https://github.com/RPDevs-Vault/mega-embed-2",
+    "description": "",
+    "is_fork": false,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/mega-embed-2/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/me2me2": {
+    "owner": "RPDevs-Vault",
+    "name": "me2me2",
+    "html_url": "https://github.com/RPDevs-Vault/me2me2",
+    "description": "",
+    "is_fork": false,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/me2me2/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/docker-aria2-with-webui": {
+    "owner": "RPDevs-Vault",
+    "name": "docker-aria2-with-webui",
+    "html_url": "https://github.com/RPDevs-Vault/docker-aria2-with-webui",
+    "description": "Docker container for Aria2 download client with integrated WebUI.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/docker-aria2-with-webui/blob/master/Dockerfile"
+      }
+    }
+  },
+  "RPDevs-Vault/docker-openwisp": {
+    "owner": "RPDevs-Vault",
+    "name": "docker-openwisp",
+    "html_url": "https://github.com/RPDevs-Vault/docker-openwisp",
+    "description": "OpenWISP in docker. For production usage we recommend using the ansible-openwisp2 role.",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/docker-openwisp/blob/master/Makefile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/docker-openwisp/blob/master/docker-compose.yml"
+      }
+    }
+  },
+  "RPDevs-Vault/geek-cookbook": {
+    "owner": "RPDevs-Vault",
+    "name": "geek-cookbook",
+    "html_url": "https://github.com/RPDevs-Vault/geek-cookbook",
+    "description": "The \"Geek's Cookbook\" is a collection of guides for establishing your own highly-available \"private cloud\" and using it to run self-hosted services such as GitLab, Plex, NextCloud, etc.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/geek-cookbook/blob/main/Dockerfile"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/geek-cookbook/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/MALSync": {
+    "owner": "RPDevs-Vault",
+    "name": "MALSync",
+    "html_url": "https://github.com/RPDevs-Vault/MALSync",
+    "description": "Integrates MyAnimeList/AniList/Kitsu/Simkl into various sites, with auto episode tracking.",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/MALSync/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/luci-app-easymesh": {
+    "owner": "RPDevs-Vault",
+    "name": "luci-app-easymesh",
+    "html_url": "https://github.com/RPDevs-Vault/luci-app-easymesh",
+    "description": "A lightweight OpenWRT LuCI app for quickly deploying and managing a Batman-adv mesh WiFi network with support for WireGuard and advanced mesh configurations.",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/luci-app-easymesh/blob/main/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/castkodi": {
+    "owner": "RPDevs-Vault",
+    "name": "castkodi",
+    "html_url": "https://github.com/RPDevs-Vault/castkodi",
+    "description": "WebExtension to cast videos and music to Kodi.",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/castkodi/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/skin.nimbus": {
+    "owner": "RPDevs-Vault",
+    "name": "skin.nimbus",
+    "html_url": "https://github.com/RPDevs-Vault/skin.nimbus",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/skin.nimbus/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/open-webui": {
+    "owner": "RPDevs-Vault",
+    "name": "open-webui",
+    "html_url": "https://github.com/RPDevs-Vault/open-webui",
+    "description": "User-friendly AI Interface (Supports Ollama, OpenAI API, ...)",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/open-webui/blob/main/Dockerfile"
+      },
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/open-webui/blob/main/Makefile"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/open-webui/blob/main/package.json"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/open-webui/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/ComfyUI-3D-Pack": {
+    "owner": "RPDevs-Vault",
+    "name": "ComfyUI-3D-Pack",
+    "html_url": "https://github.com/RPDevs-Vault/ComfyUI-3D-Pack",
+    "description": "An extensive node suite that enables ComfyUI to process 3D inputs (Mesh & UV Texture, etc) using cutting edge algorithms (3DGS, NeRF, etc.)",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/ComfyUI-3D-Pack/blob/main/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/ComfyUI-3D-Pack/blob/main/docker-compose.yml"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/ComfyUI-3D-Pack/blob/main/pyproject.toml"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/ComfyUI-3D-Pack/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/refined-github": {
+    "owner": "RPDevs-Vault",
+    "name": "refined-github",
+    "html_url": "https://github.com/RPDevs-Vault/refined-github",
+    "description": ":octocat: Browser extension that simplifies the GitHub interface and adds useful features",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/refined-github/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/Osintgram": {
+    "owner": "RPDevs-Vault",
+    "name": "Osintgram",
+    "html_url": "https://github.com/RPDevs-Vault/Osintgram",
+    "description": "Osintgram is a OSINT tool on Instagram. It offers an interactive shell to perform analysis on Instagram account of any users by its nickname",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/Osintgram/blob/master/Dockerfile"
+      },
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/Osintgram/blob/master/Makefile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/Osintgram/blob/master/docker-compose.yml"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/Osintgram/blob/master/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/OSINT-Framework": {
+    "owner": "RPDevs-Vault",
+    "name": "OSINT-Framework",
+    "html_url": "https://github.com/RPDevs-Vault/OSINT-Framework",
+    "description": "OSINT Framework",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/OSINT-Framework/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/Otaku-Testing": {
+    "owner": "RPDevs-Vault",
+    "name": "Otaku-Testing",
+    "html_url": "https://github.com/RPDevs-Vault/Otaku-Testing",
+    "description": "Testing Repository for Otaku Development ",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/Otaku-Testing/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/Radioberry-2.x": {
+    "owner": "RPDevs-Vault",
+    "name": "Radioberry-2.x",
+    "html_url": "https://github.com/RPDevs-Vault/Radioberry-2.x",
+    "description": "Ham Radio hat for Raspberry PI",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/Radioberry-2.x/blob/master/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/tinySA": {
+    "owner": "RPDevs-Vault",
+    "name": "tinySA",
+    "html_url": "https://github.com/RPDevs-Vault/tinySA",
+    "description": "tiny Spectrum Analyzer",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/tinySA/blob/main/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/a4kSubtitles": {
+    "owner": "RPDevs-Vault",
+    "name": "a4kSubtitles",
+    "html_url": "https://github.com/RPDevs-Vault/a4kSubtitles",
+    "description": "a4kSubtitles (Multi-source subtitles addon for KODI)",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/a4kSubtitles/blob/master/addon.xml"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/a4kSubtitles/blob/master/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/kitsunekko-mirror": {
+    "owner": "RPDevs-Vault",
+    "name": "kitsunekko-mirror",
+    "html_url": "https://github.com/RPDevs-Vault/kitsunekko-mirror",
+    "description": "\ud83c\udf38 A large catalog of Japanese subtitles. It also includes a backup mirror of kitsunekko.",
+    "is_fork": true,
+    "dependency_files": {
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/kitsunekko-mirror/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/nav-speculation": {
+    "owner": "RPDevs-Vault",
+    "name": "nav-speculation",
+    "html_url": "https://github.com/RPDevs-Vault/nav-speculation",
+    "description": "Proposal to enable privacy-enhanced preloading",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/nav-speculation/blob/main/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/nanovna-saver": {
+    "owner": "RPDevs-Vault",
+    "name": "nanovna-saver",
+    "html_url": "https://github.com/RPDevs-Vault/nanovna-saver",
+    "description": "A tool for reading, displaying and saving data from the NanoVNA",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/nanovna-saver/blob/main/Makefile"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/nanovna-saver/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/clickclickclick": {
+    "owner": "RPDevs-Vault",
+    "name": "clickclickclick",
+    "html_url": "https://github.com/RPDevs-Vault/clickclickclick",
+    "description": "A framework to enable autonomous android and computer use using any LLM (local or remote)",
+    "is_fork": true,
+    "dependency_files": {
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/clickclickclick/blob/main/pyproject.toml"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/clickclickclick/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/droidrun": {
+    "owner": "RPDevs-Vault",
+    "name": "droidrun",
+    "html_url": "https://github.com/RPDevs-Vault/droidrun",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/droidrun/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/SDRPlusPlus": {
+    "owner": "RPDevs-Vault",
+    "name": "SDRPlusPlus",
+    "html_url": "https://github.com/RPDevs-Vault/SDRPlusPlus",
+    "description": "Cross-Platform SDR Software",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/SDRPlusPlus/blob/master/CMakeLists.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/tailscale-repo": {
+    "owner": "RPDevs-Vault",
+    "name": "tailscale-repo",
+    "html_url": "https://github.com/RPDevs-Vault/tailscale-repo",
+    "description": "The easiest, most secure way to use WireGuard and 2FA.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/tailscale-repo/blob/main/Dockerfile"
+      },
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/tailscale-repo/blob/main/Makefile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/tailscale-repo/blob/main/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/wireguard-go": {
+    "owner": "RPDevs-Vault",
+    "name": "wireguard-go",
+    "html_url": "https://github.com/RPDevs-Vault/wireguard-go",
+    "description": "Mirror only. Official repository is at https://git.zx2c4.com/wireguard-go",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/wireguard-go/blob/master/Makefile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/wireguard-go/blob/master/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/firefox-webserial": {
+    "owner": "RPDevs-Vault",
+    "name": "firefox-webserial",
+    "html_url": "https://github.com/RPDevs-Vault/firefox-webserial",
+    "description": "WebSerial API Polyfill for Mozilla Firefox browser",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/firefox-webserial/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/Stirling-PDF": {
+    "owner": "RPDevs-Vault",
+    "name": "Stirling-PDF",
+    "html_url": "https://github.com/RPDevs-Vault/Stirling-PDF",
+    "description": "#1 Locally hosted web application that allows you to perform various operations on PDF files",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/Stirling-PDF/blob/main/Dockerfile"
+      }
+    }
+  },
+  "RPDevs-Vault/Heimdall": {
+    "owner": "RPDevs-Vault",
+    "name": "Heimdall",
+    "html_url": "https://github.com/RPDevs-Vault/Heimdall",
+    "description": "Heimdall is a cross-platform open-source tool suite used to flash firmware (aka ROMs) onto Samsung Galaxy devices.",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/Heimdall/blob/master/CMakeLists.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/darkreader": {
+    "owner": "RPDevs-Vault",
+    "name": "darkreader",
+    "html_url": "https://github.com/RPDevs-Vault/darkreader",
+    "description": "Dark Reader Chrome and Firefox extension",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/darkreader/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/easylist": {
+    "owner": "RPDevs-Vault",
+    "name": "easylist",
+    "html_url": "https://github.com/RPDevs-Vault/easylist",
+    "description": "EasyList filter subscription (EasyList, EasyPrivacy, EasyList Cookie, Fanboy's Social/Annoyances/Notifications Blocking List)",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/easylist/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/mayhem-firmware": {
+    "owner": "RPDevs-Vault",
+    "name": "mayhem-firmware",
+    "html_url": "https://github.com/RPDevs-Vault/mayhem-firmware",
+    "description": "Custom firmware for the HackRF+PortaPack H1/H2/H4",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/mayhem-firmware/blob/next/CMakeLists.txt"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/mayhem-firmware/blob/next/docker-compose.yml"
+      }
+    }
+  },
+  "RPDevs-Vault/skin.titan.bingie.mod": {
+    "owner": "RPDevs-Vault",
+    "name": "skin.titan.bingie.mod",
+    "html_url": "https://github.com/RPDevs-Vault/skin.titan.bingie.mod",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/skin.titan.bingie.mod/blob/omega/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/skin.bingie": {
+    "owner": "RPDevs-Vault",
+    "name": "skin.bingie",
+    "html_url": "https://github.com/RPDevs-Vault/skin.bingie",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/skin.bingie/blob/omega/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/pydoll": {
+    "owner": "RPDevs-Vault",
+    "name": "pydoll",
+    "html_url": "https://github.com/RPDevs-Vault/pydoll",
+    "description": "Pydoll is a library for automating chromium-based browsers without a WebDriver, offering realistic interactions. ",
+    "is_fork": true,
+    "dependency_files": {
+      "poetry.lock": {
+        "type": "Python (Poetry)",
+        "path": "poetry.lock",
+        "html_url": "https://github.com/RPDevs-Vault/pydoll/blob/main/poetry.lock"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/pydoll/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/invidious": {
+    "owner": "RPDevs-Vault",
+    "name": "invidious",
+    "html_url": "https://github.com/RPDevs-Vault/invidious",
+    "description": "Invidious is an alternative front-end to YouTube",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/invidious/blob/master/Makefile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/invidious/blob/master/docker-compose.yml"
+      }
+    }
+  },
+  "RPDevs-Vault/plugin.video.invidious": {
+    "owner": "RPDevs-Vault",
+    "name": "plugin.video.invidious",
+    "html_url": "https://github.com/RPDevs-Vault/plugin.video.invidious",
+    "description": "Invidious Addon for Kodi.",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/plugin.video.invidious/blob/master/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/Pinout.xyz": {
+    "owner": "RPDevs-Vault",
+    "name": "Pinout.xyz",
+    "html_url": "https://github.com/RPDevs-Vault/Pinout.xyz",
+    "description": "Source files for the Raspberry Pi Pinout documentation website.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/Pinout.xyz/blob/master/Dockerfile"
+      },
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/Pinout.xyz/blob/master/Makefile"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/Pinout.xyz/blob/master/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/BMAD-METHOD": {
+    "owner": "RPDevs-Vault",
+    "name": "BMAD-METHOD",
+    "html_url": "https://github.com/RPDevs-Vault/BMAD-METHOD",
+    "description": "Breakthrough Method for Agile Ai Driven Development",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/BMAD-METHOD/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/markitdown": {
+    "owner": "RPDevs-Vault",
+    "name": "markitdown",
+    "html_url": "https://github.com/RPDevs-Vault/markitdown",
+    "description": "Python tool for converting files and office documents to Markdown.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/markitdown/blob/main/Dockerfile"
+      }
+    }
+  },
+  "RPDevs-Vault/ML-For-Beginners": {
+    "owner": "RPDevs-Vault",
+    "name": "ML-For-Beginners",
+    "html_url": "https://github.com/RPDevs-Vault/ML-For-Beginners",
+    "description": "12 weeks, 26 lessons, 52 quizzes, classic Machine Learning for all",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/ML-For-Beginners/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/generative-ai-for-beginners": {
+    "owner": "RPDevs-Vault",
+    "name": "generative-ai-for-beginners",
+    "html_url": "https://github.com/RPDevs-Vault/generative-ai-for-beginners",
+    "description": "21 Lessons, Get Started Building with Generative AI  \ud83d\udd17 https://microsoft.github.io/generative-ai-for-beginners/",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/generative-ai-for-beginners/blob/main/package.json"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/generative-ai-for-beginners/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/ghostty": {
+    "owner": "RPDevs-Vault",
+    "name": "ghostty",
+    "html_url": "https://github.com/RPDevs-Vault/ghostty",
+    "description": "\ud83d\udc7b Ghostty is a fast, feature-rich, and cross-platform terminal emulator that uses platform-native UI and GPU acceleration.",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/ghostty/blob/main/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/rvx-builds": {
+    "owner": "RPDevs-Vault",
+    "name": "rvx-builds",
+    "html_url": "https://github.com/RPDevs-Vault/rvx-builds",
+    "description": "A tool to integrate building ReVanced apps with Tasker for automation.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/rvx-builds/blob/main/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/rvx-builds/blob/main/docker-compose.yml"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/rvx-builds/blob/main/pyproject.toml"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/rvx-builds/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/universal-android-debloater": {
+    "owner": "RPDevs-Vault",
+    "name": "universal-android-debloater",
+    "html_url": "https://github.com/RPDevs-Vault/universal-android-debloater",
+    "description": "Cross-platform GUI written in Rust using ADB to debloat non-rooted android devices. Improve your privacy, the security and battery life of your device.",
+    "is_fork": true,
+    "dependency_files": {
+      "Cargo.toml": {
+        "type": "Rust (Cargo)",
+        "path": "Cargo.toml",
+        "html_url": "https://github.com/RPDevs-Vault/universal-android-debloater/blob/main/Cargo.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/universal-android-debloater-next-generation": {
+    "owner": "RPDevs-Vault",
+    "name": "universal-android-debloater-next-generation",
+    "html_url": "https://github.com/RPDevs-Vault/universal-android-debloater-next-generation",
+    "description": "Cross-platform GUI written in Rust using ADB to debloat non-rooted Android devices. Improve your privacy, the security and battery life of your device.",
+    "is_fork": true,
+    "dependency_files": {
+      "Cargo.toml": {
+        "type": "Rust (Cargo)",
+        "path": "Cargo.toml",
+        "html_url": "https://github.com/RPDevs-Vault/universal-android-debloater-next-generation/blob/main/Cargo.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/RSSHub": {
+    "owner": "RPDevs-Vault",
+    "name": "RSSHub",
+    "html_url": "https://github.com/RPDevs-Vault/RSSHub",
+    "description": "\ud83e\udde1 Everything is RSSible",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/RSSHub/blob/master/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/RSSHub/blob/master/docker-compose.yml"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/RSSHub/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/ntfy": {
+    "owner": "RPDevs-Vault",
+    "name": "ntfy",
+    "html_url": "https://github.com/RPDevs-Vault/ntfy",
+    "description": "Send push notifications to your phone or desktop using PUT/POST",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/ntfy/blob/main/Dockerfile"
+      },
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/ntfy/blob/main/Makefile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/ntfy/blob/main/docker-compose.yml"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/ntfy/blob/main/go.mod"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/ntfy/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/android-adb-tools": {
+    "owner": "RPDevs-Vault",
+    "name": "android-adb-tools",
+    "html_url": "https://github.com/RPDevs-Vault/android-adb-tools",
+    "description": "ADB & Fastboot tools for Android",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/android-adb-tools/blob/noroot/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/tldr": {
+    "owner": "RPDevs-Vault",
+    "name": "tldr",
+    "html_url": "https://github.com/RPDevs-Vault/tldr",
+    "description": "\ud83d\udcda Collaborative cheatsheets for console commands",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/tldr/blob/main/package.json"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/tldr/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/trackawesomelist-source": {
+    "owner": "RPDevs-Vault",
+    "name": "trackawesomelist-source",
+    "html_url": "https://github.com/RPDevs-Vault/trackawesomelist-source",
+    "description": "Track Awesome List Source Code, build with Deno.",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/trackawesomelist-source/blob/main/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/gr-uaslink": {
+    "owner": "RPDevs-Vault",
+    "name": "gr-uaslink",
+    "html_url": "https://github.com/RPDevs-Vault/gr-uaslink",
+    "description": "DARPA HackFest",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/gr-uaslink/blob/master/CMakeLists.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/satellite-jamming-simulator": {
+    "owner": "RPDevs-Vault",
+    "name": "satellite-jamming-simulator",
+    "html_url": "https://github.com/RPDevs-Vault/satellite-jamming-simulator",
+    "description": "A simple simulator for modeling earth-to-space RFI attacks. Demonstrated at DEFCON 30.",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/satellite-jamming-simulator/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/dds.mil": {
+    "owner": "RPDevs-Vault",
+    "name": "dds.mil",
+    "html_url": "https://github.com/RPDevs-Vault/dds.mil",
+    "description": "The website of the Defense Digital Service.",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/dds.mil/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/send": {
+    "owner": "RPDevs-Vault",
+    "name": "send",
+    "html_url": "https://github.com/RPDevs-Vault/send",
+    "description": ":mailbox_with_mail: Simple, private file sharing. Mirror of https://gitlab.com/timvisee/send",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/send/blob/master/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/send/blob/master/docker-compose.yml"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/send/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/linutil": {
+    "owner": "RPDevs-Vault",
+    "name": "linutil",
+    "html_url": "https://github.com/RPDevs-Vault/linutil",
+    "description": "Chris Titus Tech's Linux Toolbox - Linutil is a distro-agnostic toolbox designed to simplify everyday Linux tasks.",
+    "is_fork": true,
+    "dependency_files": {
+      "Cargo.toml": {
+        "type": "Rust (Cargo)",
+        "path": "Cargo.toml",
+        "html_url": "https://github.com/RPDevs-Vault/linutil/blob/main/Cargo.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/PlaystoreDownloader": {
+    "owner": "RPDevs-Vault",
+    "name": "PlaystoreDownloader",
+    "html_url": "https://github.com/RPDevs-Vault/PlaystoreDownloader",
+    "description": "A command line tool to download Android applications directly from the Google Play Store by specifying their package name (an initial one-time configuration is required)",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/PlaystoreDownloader/blob/master/Dockerfile"
+      },
+      "Pipfile": {
+        "type": "Python (Pipenv)",
+        "path": "Pipfile",
+        "html_url": "https://github.com/RPDevs-Vault/PlaystoreDownloader/blob/master/Pipfile"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/PlaystoreDownloader/blob/master/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/transmission-rpc": {
+    "owner": "RPDevs-Vault",
+    "name": "transmission-rpc",
+    "html_url": "https://github.com/RPDevs-Vault/transmission-rpc",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/transmission-rpc/blob/master/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/open-lovable": {
+    "owner": "RPDevs-Vault",
+    "name": "open-lovable",
+    "html_url": "https://github.com/RPDevs-Vault/open-lovable",
+    "description": "\ud83d\udd25 Clone and recreate any website as a modern React app in seconds",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/open-lovable/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/material-components-web": {
+    "owner": "RPDevs-Vault",
+    "name": "material-components-web",
+    "html_url": "https://github.com/RPDevs-Vault/material-components-web",
+    "description": "Modular and customizable Material Design UI components for the web",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/material-components-web/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/components": {
+    "owner": "RPDevs-Vault",
+    "name": "components",
+    "html_url": "https://github.com/RPDevs-Vault/components",
+    "description": "Component infrastructure and Material Design components for Angular",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/components/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/epic-sandbox": {
+    "owner": "RPDevs-Vault",
+    "name": "epic-sandbox",
+    "html_url": "https://github.com/RPDevs-Vault/epic-sandbox",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/epic-sandbox/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/jikan-rest": {
+    "owner": "RPDevs-Vault",
+    "name": "jikan-rest",
+    "html_url": "https://github.com/RPDevs-Vault/jikan-rest",
+    "description": "The REST API for Jikan",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/jikan-rest/blob/master/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/jikan-rest/blob/master/docker-compose.yml"
+      }
+    }
+  },
+  "RPDevs-Vault/cf-clearance-scraper": {
+    "owner": "RPDevs-Vault",
+    "name": "cf-clearance-scraper",
+    "html_url": "https://github.com/RPDevs-Vault/cf-clearance-scraper",
+    "description": "This library was created for testing and training purposes to retrieve the page source of websites, create Cloudflare Turnstile tokens and create Cloudflare WAF sessions.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/cf-clearance-scraper/blob/main/Dockerfile"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/cf-clearance-scraper/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/puppeteer-real-browser": {
+    "owner": "RPDevs-Vault",
+    "name": "puppeteer-real-browser",
+    "html_url": "https://github.com/RPDevs-Vault/puppeteer-real-browser",
+    "description": "This package is designed to bypass puppeteer's bot-detecting captchas such as Cloudflare. It acts like a real browser and can be managed with puppeteer. ",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/puppeteer-real-browser/blob/main/Dockerfile"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/puppeteer-real-browser/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/executorch": {
+    "owner": "RPDevs-Vault",
+    "name": "executorch",
+    "html_url": "https://github.com/RPDevs-Vault/executorch",
+    "description": "On-device AI across mobile, embedded and edge for PyTorch",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/executorch/blob/main/CMakeLists.txt"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/executorch/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/ezlink-scraper": {
+    "owner": "RPDevs-Vault",
+    "name": "ezlink-scraper",
+    "html_url": "https://github.com/RPDevs-Vault/ezlink-scraper",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/ezlink-scraper/blob/main/Dockerfile"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/ezlink-scraper/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/use-media-stream": {
+    "owner": "RPDevs-Vault",
+    "name": "use-media-stream",
+    "html_url": "https://github.com/RPDevs-Vault/use-media-stream",
+    "description": "React hook that simplifies the integration and management \ud83c\udfd7\ufe0f of media streams with extensive control over devices, streaming status, and event handling. \ud83d\udcf9",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/use-media-stream/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/http2-proxy-request": {
+    "owner": "RPDevs-Vault",
+    "name": "http2-proxy-request",
+    "html_url": "https://github.com/RPDevs-Vault/http2-proxy-request",
+    "description": "This library allows you to send requests using a proxy with the http2 protocol. If you don't need to use it with a proxy, check the node:http2 library.",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/http2-proxy-request/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/jx": {
+    "owner": "RPDevs-Vault",
+    "name": "jx",
+    "html_url": "https://github.com/RPDevs-Vault/jx",
+    "description": "Jenkins X provides automated CI+CD for Kubernetes with Preview Environments on Pull Requests using Cloud Native pipelines from Tekton",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/jx/blob/main/Dockerfile"
+      },
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/jx/blob/main/Makefile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/jx/blob/main/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/Stario-main": {
+    "owner": "RPDevs-Vault",
+    "name": "Stario-main",
+    "html_url": "https://github.com/RPDevs-Vault/Stario-main",
+    "description": "Do more with Stario \u2014 the minimalist launcher for you.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/Stario-main/blob/main/Dockerfile"
+      }
+    }
+  },
+  "RPDevs-Vault/plugin.audio.spotify": {
+    "owner": "RPDevs-Vault",
+    "name": "plugin.audio.spotify",
+    "html_url": "https://github.com/RPDevs-Vault/plugin.audio.spotify",
+    "description": "Unofficial Spotify for Kodi Add-on updated for Kodi 19 and 20.",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/plugin.audio.spotify/blob/master/addon.xml"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/plugin.audio.spotify/blob/master/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/visualization.goom-pp": {
+    "owner": "RPDevs-Vault",
+    "name": "visualization.goom-pp",
+    "html_url": "https://github.com/RPDevs-Vault/visualization.goom-pp",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/visualization.goom-pp/blob/master/CMakeLists.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/instagram-download-browser-extension": {
+    "owner": "RPDevs-Vault",
+    "name": "instagram-download-browser-extension",
+    "html_url": "https://github.com/RPDevs-Vault/instagram-download-browser-extension",
+    "description": "A browser extension for Instagram. Help you download images and videos.",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/instagram-download-browser-extension/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/georelays": {
+    "owner": "RPDevs-Vault",
+    "name": "georelays",
+    "html_url": "https://github.com/RPDevs-Vault/georelays",
+    "description": "a collection of nostr relays and their estimated locations",
+    "is_fork": true,
+    "dependency_files": {
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/georelays/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/obs-multi-rtmp": {
+    "owner": "RPDevs-Vault",
+    "name": "obs-multi-rtmp",
+    "html_url": "https://github.com/RPDevs-Vault/obs-multi-rtmp",
+    "description": "OBS\u8907\u6570\u30b5\u30a4\u30c8\u540c\u6642\u914d\u4fe1\u30d7\u30e9\u30b0\u30a4\u30f3",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/obs-multi-rtmp/blob/master/CMakeLists.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/wpprobe": {
+    "owner": "RPDevs-Vault",
+    "name": "wpprobe",
+    "html_url": "https://github.com/RPDevs-Vault/wpprobe",
+    "description": "A fast WordPress plugin enumeration tool",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/wpprobe/blob/main/Dockerfile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/wpprobe/blob/main/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/plugin.video.ipcams": {
+    "owner": "RPDevs-Vault",
+    "name": "plugin.video.ipcams",
+    "html_url": "https://github.com/RPDevs-Vault/plugin.video.ipcams",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/plugin.video.ipcams/blob/Matrix/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/legion": {
+    "owner": "RPDevs-Vault",
+    "name": "legion",
+    "html_url": "https://github.com/RPDevs-Vault/legion",
+    "description": "Legion is an open source, easy-to-use, super-extensible and semi-automated network penetration testing tool that aids in discovery, reconnaissance and exploitation of information systems.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/legion/blob/master/Dockerfile"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/legion/blob/master/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/plugin.program.iagl": {
+    "owner": "RPDevs-Vault",
+    "name": "plugin.program.iagl",
+    "html_url": "https://github.com/RPDevs-Vault/plugin.program.iagl",
+    "description": "The Internet Archive Game Launcher (IAGL) will launch Games from the Internet using Kodi",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/plugin.program.iagl/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/claude-code-action": {
+    "owner": "RPDevs-Vault",
+    "name": "claude-code-action",
+    "html_url": "https://github.com/RPDevs-Vault/claude-code-action",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/claude-code-action/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/huggingface_datasets": {
+    "owner": "RPDevs-Vault",
+    "name": "huggingface_datasets",
+    "html_url": "https://github.com/RPDevs-Vault/huggingface_datasets",
+    "description": "\ud83e\udd17 The largest hub of ready-to-use datasets for AI models with fast, easy-to-use and efficient data manipulation tools",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/huggingface_datasets/blob/main/Makefile"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/huggingface_datasets/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/nousnet": {
+    "owner": "RPDevs-Vault",
+    "name": "nousnet",
+    "html_url": "https://github.com/RPDevs-Vault/nousnet",
+    "description": "An open infrastructure to democratize and decentralize the development of superintelligence for humanity.",
+    "is_fork": true,
+    "dependency_files": {
+      "Cargo.toml": {
+        "type": "Rust (Cargo)",
+        "path": "Cargo.toml",
+        "html_url": "https://github.com/RPDevs-Vault/nousnet/blob/main/Cargo.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/psyche-backoffice": {
+    "owner": "RPDevs-Vault",
+    "name": "psyche-backoffice",
+    "html_url": "https://github.com/RPDevs-Vault/psyche-backoffice",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/psyche-backoffice/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/pokemon-agent": {
+    "owner": "RPDevs-Vault",
+    "name": "pokemon-agent",
+    "html_url": "https://github.com/RPDevs-Vault/pokemon-agent",
+    "description": "AI-powered Pokemon gameplay agent with headless emulation, REST API, and live dashboard. Works with any LLM.",
+    "is_fork": true,
+    "dependency_files": {
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/pokemon-agent/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/mystikos": {
+    "owner": "RPDevs-Vault",
+    "name": "mystikos",
+    "html_url": "https://github.com/RPDevs-Vault/mystikos",
+    "description": "Tools and runtime for launching unmodified container images in Trusted Execution Environments",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/mystikos/blob/main/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/awesome-userscripts": {
+    "owner": "RPDevs-Vault",
+    "name": "awesome-userscripts",
+    "html_url": "https://github.com/RPDevs-Vault/awesome-userscripts",
+    "description": "\ud83d\udcd6  A curated list of Awesome Userscripts.",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/awesome-userscripts/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/Ventoy": {
+    "owner": "RPDevs-Vault",
+    "name": "Ventoy",
+    "html_url": "https://github.com/RPDevs-Vault/Ventoy",
+    "description": "A new bootable USB solution.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/Ventoy/blob/master/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/Ventoy/blob/master/docker-compose.yml"
+      }
+    }
+  },
+  "RPDevs-Vault/e2b-cookbook": {
+    "owner": "RPDevs-Vault",
+    "name": "e2b-cookbook",
+    "html_url": "https://github.com/RPDevs-Vault/e2b-cookbook",
+    "description": "Examples of using E2B",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/e2b-cookbook/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/lms": {
+    "owner": "RPDevs-Vault",
+    "name": "lms",
+    "html_url": "https://github.com/RPDevs-Vault/lms",
+    "description": "LM Studio CLI",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/lms/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/lmstudio-js": {
+    "owner": "RPDevs-Vault",
+    "name": "lmstudio-js",
+    "html_url": "https://github.com/RPDevs-Vault/lmstudio-js",
+    "description": "LM Studio TypeScript SDK",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/lmstudio-js/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/lmstudio-python": {
+    "owner": "RPDevs-Vault",
+    "name": "lmstudio-python",
+    "html_url": "https://github.com/RPDevs-Vault/lmstudio-python",
+    "description": "LM Studio Python SDK",
+    "is_fork": true,
+    "dependency_files": {
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/lmstudio-python/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/venvstacks": {
+    "owner": "RPDevs-Vault",
+    "name": "venvstacks",
+    "html_url": "https://github.com/RPDevs-Vault/venvstacks",
+    "description": "Virtual environment stacks for Python",
+    "is_fork": true,
+    "dependency_files": {
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/venvstacks/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/thingino-onvif": {
+    "owner": "RPDevs-Vault",
+    "name": "thingino-onvif",
+    "html_url": "https://github.com/RPDevs-Vault/thingino-onvif",
+    "description": "onvif simple server modified for use with thingino firmware",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/thingino-onvif/blob/master/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/debrid-media-manager": {
+    "owner": "RPDevs-Vault",
+    "name": "debrid-media-manager",
+    "html_url": "https://github.com/RPDevs-Vault/debrid-media-manager",
+    "description": "Curate an inifinite media library",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/debrid-media-manager/blob/main/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/debrid-media-manager/blob/main/docker-compose.yml"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/debrid-media-manager/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/openlibrary": {
+    "owner": "RPDevs-Vault",
+    "name": "openlibrary",
+    "html_url": "https://github.com/RPDevs-Vault/openlibrary",
+    "description": "One webpage for every book ever published!",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/openlibrary/blob/master/Makefile"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/openlibrary/blob/master/package.json"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/openlibrary/blob/master/pyproject.toml"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/openlibrary/blob/master/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/generator-userscript": {
+    "owner": "RPDevs-Vault",
+    "name": "generator-userscript",
+    "html_url": "https://github.com/RPDevs-Vault/generator-userscript",
+    "description": "A yeoman generator to create a userscript project rapidly",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/generator-userscript/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/QtScrcpy": {
+    "owner": "RPDevs-Vault",
+    "name": "QtScrcpy",
+    "html_url": "https://github.com/RPDevs-Vault/QtScrcpy",
+    "description": "Android real-time display control software",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/QtScrcpy/blob/dev/CMakeLists.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/QtScrcpyCore": {
+    "owner": "RPDevs-Vault",
+    "name": "QtScrcpyCore",
+    "html_url": "https://github.com/RPDevs-Vault/QtScrcpyCore",
+    "description": "Android real-time display control library",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/QtScrcpyCore/blob/main/CMakeLists.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/htmlparser2": {
+    "owner": "RPDevs-Vault",
+    "name": "htmlparser2",
+    "html_url": "https://github.com/RPDevs-Vault/htmlparser2",
+    "description": "The fast & forgiving HTML and XML parser",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/htmlparser2/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/powerlevel10k": {
+    "owner": "RPDevs-Vault",
+    "name": "powerlevel10k",
+    "html_url": "https://github.com/RPDevs-Vault/powerlevel10k",
+    "description": "A Zsh theme",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/powerlevel10k/blob/master/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/Athena-Public": {
+    "owner": "RPDevs-Vault",
+    "name": "Athena-Public",
+    "html_url": "https://github.com/RPDevs-Vault/Athena-Public",
+    "description": "The Linux OS for AI Agents \u2014 Persistent memory, autonomy, and time-awareness for any LLM. Own the state. Rent the intelligence.",
+    "is_fork": true,
+    "dependency_files": {
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/Athena-Public/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/mail-for-good": {
+    "owner": "RPDevs-Vault",
+    "name": "mail-for-good",
+    "html_url": "https://github.com/RPDevs-Vault/mail-for-good",
+    "description": "An open source email campaign management tool for nonprofits",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/mail-for-good/blob/master/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/mail-for-good/blob/master/docker-compose.yml"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/mail-for-good/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/clawhub": {
+    "owner": "RPDevs-Vault",
+    "name": "clawhub",
+    "html_url": "https://github.com/RPDevs-Vault/clawhub",
+    "description": "Skill + Plugin Registry for OpenClaw",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/clawhub/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/gogcli": {
+    "owner": "RPDevs-Vault",
+    "name": "gogcli",
+    "html_url": "https://github.com/RPDevs-Vault/gogcli",
+    "description": "Google Workspace in your terminal.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/gogcli/blob/main/Dockerfile"
+      },
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/gogcli/blob/main/Makefile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/gogcli/blob/main/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/webdev-curriculum": {
+    "owner": "RPDevs-Vault",
+    "name": "webdev-curriculum",
+    "html_url": "https://github.com/RPDevs-Vault/webdev-curriculum",
+    "description": "The open curriculum for learning web development",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/webdev-curriculum/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/kubernetes": {
+    "owner": "RPDevs-Vault",
+    "name": "kubernetes",
+    "html_url": "https://github.com/RPDevs-Vault/kubernetes",
+    "description": "Production-Grade Container Scheduling and Management",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/kubernetes/blob/master/Makefile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/kubernetes/blob/master/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/go-ethereum": {
+    "owner": "RPDevs-Vault",
+    "name": "go-ethereum",
+    "html_url": "https://github.com/RPDevs-Vault/go-ethereum",
+    "description": "Go implementation of the Ethereum protocol",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/go-ethereum/blob/master/Dockerfile"
+      },
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/go-ethereum/blob/master/Makefile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/go-ethereum/blob/master/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/ollama": {
+    "owner": "RPDevs-Vault",
+    "name": "ollama",
+    "html_url": "https://github.com/RPDevs-Vault/ollama",
+    "description": "Get up and running with Kimi-K2.5, GLM-5, MiniMax, DeepSeek, gpt-oss, Qwen, Gemma and other models.",
+    "is_fork": true,
+    "dependency_files": {
+      "CMakeLists.txt": {
+        "type": "C/C++ (CMake)",
+        "path": "CMakeLists.txt",
+        "html_url": "https://github.com/RPDevs-Vault/ollama/blob/main/CMakeLists.txt"
+      },
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/ollama/blob/main/Dockerfile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/ollama/blob/main/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/prometheus": {
+    "owner": "RPDevs-Vault",
+    "name": "prometheus",
+    "html_url": "https://github.com/RPDevs-Vault/prometheus",
+    "description": "The Prometheus monitoring system and time series database.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/prometheus/blob/main/Dockerfile"
+      },
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/prometheus/blob/main/Makefile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/prometheus/blob/main/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/new-api-docs-v1": {
+    "owner": "RPDevs-Vault",
+    "name": "new-api-docs-v1",
+    "html_url": "https://github.com/RPDevs-Vault/new-api-docs-v1",
+    "description": "New API v1 official website documentation",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/new-api-docs-v1/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/new-api": {
+    "owner": "RPDevs-Vault",
+    "name": "new-api",
+    "html_url": "https://github.com/RPDevs-Vault/new-api",
+    "description": "A unified AI model hub for aggregation & distribution. It supports cross-converting various LLMs into OpenAI-compatible, Claude-compatible, or Gemini-compatible formats. A centralized gateway for personal and enterprise model management. \ud83c\udf65",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/new-api/blob/main/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/new-api/blob/main/docker-compose.yml"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/new-api/blob/main/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/Xray-core": {
+    "owner": "RPDevs-Vault",
+    "name": "Xray-core",
+    "html_url": "https://github.com/RPDevs-Vault/Xray-core",
+    "description": "Xray, Penetrates Everything. Also the best v2ray-core. Where the magic happens. An open platform for various uses.",
+    "is_fork": true,
+    "dependency_files": {
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/Xray-core/blob/main/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/rclone": {
+    "owner": "RPDevs-Vault",
+    "name": "rclone",
+    "html_url": "https://github.com/RPDevs-Vault/rclone",
+    "description": "\"rsync for cloud storage\" - Google Drive, S3, Dropbox, Backblaze B2, One Drive, Swift, Hubic, Wasabi, Google Cloud Storage, Azure Blob, Azure Files, Yandex Files",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/rclone/blob/master/Dockerfile"
+      },
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/rclone/blob/master/Makefile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/rclone/blob/master/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/uptime-kuma": {
+    "owner": "RPDevs-Vault",
+    "name": "uptime-kuma",
+    "html_url": "https://github.com/RPDevs-Vault/uptime-kuma",
+    "description": "A fancy self-hosted monitoring tool",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/uptime-kuma/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/git-extra-commands": {
+    "owner": "RPDevs-Vault",
+    "name": "git-extra-commands",
+    "html_url": "https://github.com/RPDevs-Vault/git-extra-commands",
+    "description": "A collection of git utilities, useful extra git scripts, tutorials and other useful articles.",
+    "is_fork": true,
+    "dependency_files": {
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/git-extra-commands/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/chezmoi": {
+    "owner": "RPDevs-Vault",
+    "name": "chezmoi",
+    "html_url": "https://github.com/RPDevs-Vault/chezmoi",
+    "description": "Manage your dotfiles across multiple diverse machines, securely.",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/chezmoi/blob/master/Makefile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/chezmoi/blob/master/go.mod"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/chezmoi/blob/master/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/mkdocs-materialx": {
+    "owner": "RPDevs-Vault",
+    "name": "mkdocs-materialx",
+    "html_url": "https://github.com/RPDevs-Vault/mkdocs-materialx",
+    "description": "MaterialX, the next generation of mkdocs-material",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/mkdocs-materialx/blob/main/Dockerfile"
+      },
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/mkdocs-materialx/blob/main/package.json"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/mkdocs-materialx/blob/main/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/MineDojo-Voyager": {
+    "owner": "RPDevs-Vault",
+    "name": "MineDojo-Voyager",
+    "html_url": "https://github.com/RPDevs-Vault/MineDojo-Voyager",
+    "description": "An Open-Ended Embodied Agent with Large Language Models",
+    "is_fork": true,
+    "dependency_files": {
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/MineDojo-Voyager/blob/main/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/sherlock": {
+    "owner": "RPDevs-Vault",
+    "name": "sherlock",
+    "html_url": "https://github.com/RPDevs-Vault/sherlock",
+    "description": "Hunt down social media accounts by username across social networks",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/sherlock/blob/master/Dockerfile"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/sherlock/blob/master/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/T430-Runner": {
+    "owner": "RPDevs-Vault",
+    "name": "T430-Runner",
+    "html_url": "https://github.com/RPDevs-Vault/T430-Runner",
+    "description": "",
+    "is_fork": false,
+    "dependency_files": {
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/T430-Runner/blob/main/docker-compose.yml"
+      }
+    }
+  },
+  "RPDevs-Vault/rdt-client": {
+    "owner": "RPDevs-Vault",
+    "name": "rdt-client",
+    "html_url": "https://github.com/RPDevs-Vault/rdt-client",
+    "description": "Real-Debrid Client Proxy",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/rdt-client/blob/main/Dockerfile"
+      }
+    }
+  },
+  "RPDevs-Vault/flood-for-transmission": {
+    "owner": "RPDevs-Vault",
+    "name": "flood-for-transmission",
+    "html_url": "https://github.com/RPDevs-Vault/flood-for-transmission",
+    "description": "A Flood (https://github.com/Flood-UI/flood) clone for Transmission",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/flood-for-transmission/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/metadata.tvdb.com.python": {
+    "owner": "RPDevs-Vault",
+    "name": "metadata.tvdb.com.python",
+    "html_url": "https://github.com/RPDevs-Vault/metadata.tvdb.com.python",
+    "description": "Provides tvshow information from tvdb to Kodi",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/metadata.tvdb.com.python/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/metadata.themoviedb.org.python": {
+    "owner": "RPDevs-Vault",
+    "name": "metadata.themoviedb.org.python",
+    "html_url": "https://github.com/RPDevs-Vault/metadata.themoviedb.org.python",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/metadata.themoviedb.org.python/blob/master/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/sync_addon_metadata_translations": {
+    "owner": "RPDevs-Vault",
+    "name": "sync_addon_metadata_translations",
+    "html_url": "https://github.com/RPDevs-Vault/sync_addon_metadata_translations",
+    "description": "With this tool you can sync a Kodi add-on's metadata (Summary, Description, and Disclaimer) translations between the addon.xml and related po files.",
+    "is_fork": true,
+    "dependency_files": {
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/sync_addon_metadata_translations/blob/master/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/service.subskip": {
+    "owner": "RPDevs-Vault",
+    "name": "service.subskip",
+    "html_url": "https://github.com/RPDevs-Vault/service.subskip",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/service.subskip/blob/main/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/plugin.program.autowidget": {
+    "owner": "RPDevs-Vault",
+    "name": "plugin.program.autowidget",
+    "html_url": "https://github.com/RPDevs-Vault/plugin.program.autowidget",
+    "description": "AutoWidget is a program add-on for Kodi, designed to give a more dynamic and interesting experience to using skin widgets.",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/plugin.program.autowidget/blob/master/addon.xml"
+      }
+    }
+  },
+  "RPDevs-Vault/megacloud-key-extractor": {
+    "owner": "RPDevs-Vault",
+    "name": "megacloud-key-extractor",
+    "html_url": "https://github.com/RPDevs-Vault/megacloud-key-extractor",
+    "description": "Automatically Extract The Decryption Key From Obfuscated Script Using Known Patterns With AST Traversing + Pattern Matching (NO LONGER FUNCTIONAL)",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/megacloud-key-extractor/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/OpenRA": {
+    "owner": "RPDevs-Vault",
+    "name": "OpenRA",
+    "html_url": "https://github.com/RPDevs-Vault/OpenRA",
+    "description": "Open Source real-time strategy game engine for early Westwood games such as Command & Conquer: Red Alert written in C# using SDL and OpenGL. Runs on Windows, Linux, *BSD and Mac OS X.",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/OpenRA/blob/bleed/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/metube": {
+    "owner": "RPDevs-Vault",
+    "name": "metube",
+    "html_url": "https://github.com/RPDevs-Vault/metube",
+    "description": "Self-hosted video downloader for YouTube and other sites (web UI for yt-dlp)",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/metube/blob/master/Dockerfile"
+      },
+      "pyproject.toml": {
+        "type": "Python (Poetry/Pip)",
+        "path": "pyproject.toml",
+        "html_url": "https://github.com/RPDevs-Vault/metube/blob/master/pyproject.toml"
+      }
+    }
+  },
+  "RPDevs-Vault/demo-repository": {
+    "owner": "RPDevs-Vault",
+    "name": "demo-repository",
+    "html_url": "https://github.com/RPDevs-Vault/demo-repository",
+    "description": "A code repository designed to show the best GitHub has to offer.",
+    "is_fork": false,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/demo-repository/blob/main/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/i2pd": {
+    "owner": "RPDevs-Vault",
+    "name": "i2pd",
+    "html_url": "https://github.com/RPDevs-Vault/i2pd",
+    "description": " \ud83d\udee1 I2P: End-to-End encrypted and anonymous Internet",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/i2pd/blob/openssl/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/filebrowser": {
+    "owner": "RPDevs-Vault",
+    "name": "filebrowser",
+    "html_url": "https://github.com/RPDevs-Vault/filebrowser",
+    "description": "\ud83d\udcc2 Web File Browser",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/filebrowser/blob/master/Dockerfile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/filebrowser/blob/master/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/sftpgo": {
+    "owner": "RPDevs-Vault",
+    "name": "sftpgo",
+    "html_url": "https://github.com/RPDevs-Vault/sftpgo",
+    "description": "Full-featured and highly configurable SFTP, HTTP/S, FTP/S and WebDAV server - S3, Google Cloud Storage, Azure Blob",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/sftpgo/blob/main/Dockerfile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/sftpgo/blob/main/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/go-gh": {
+    "owner": "RPDevs-Vault",
+    "name": "go-gh",
+    "html_url": "https://github.com/RPDevs-Vault/go-gh",
+    "description": "A Go module for interacting with gh and the GitHub API from the command line. ",
+    "is_fork": true,
+    "dependency_files": {
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/go-gh/blob/trunk/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/cli": {
+    "owner": "RPDevs-Vault",
+    "name": "cli",
+    "html_url": "https://github.com/RPDevs-Vault/cli",
+    "description": "GitHub\u2019s official command line tool",
+    "is_fork": true,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/cli/blob/trunk/Makefile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/cli/blob/trunk/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/github-openwrt": {
+    "owner": "RPDevs-Vault",
+    "name": "github-openwrt",
+    "html_url": "https://github.com/RPDevs-Vault/github-openwrt",
+    "description": "Cross-compiled GitHub CLI for OpenWrt aarch64 routers",
+    "is_fork": false,
+    "dependency_files": {
+      "Makefile": {
+        "type": "Makefile / Build script",
+        "path": "Makefile",
+        "html_url": "https://github.com/RPDevs-Vault/github-openwrt/blob/main/Makefile"
+      }
+    }
+  },
+  "RPDevs-Vault/dns-proxy-server": {
+    "owner": "RPDevs-Vault",
+    "name": "dns-proxy-server",
+    "html_url": "https://github.com/RPDevs-Vault/dns-proxy-server",
+    "description": "Solve your DNS hosts from your docker containers, then from your local configuration, then from internet",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/dns-proxy-server/blob/master/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/dns-proxy-server/blob/master/docker-compose.yml"
+      }
+    }
+  },
+  "RPDevs-Vault/endlessh-go": {
+    "owner": "RPDevs-Vault",
+    "name": "endlessh-go",
+    "html_url": "https://github.com/RPDevs-Vault/endlessh-go",
+    "description": "A golang implementation of endlessh (SSH tarpit) exporting Prometheus metrics, visualized by a Grafana dashboard.",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/endlessh-go/blob/main/Dockerfile"
+      },
+      "go.mod": {
+        "type": "Go Modules",
+        "path": "go.mod",
+        "html_url": "https://github.com/RPDevs-Vault/endlessh-go/blob/main/go.mod"
+      }
+    }
+  },
+  "RPDevs-Vault/addons-linter": {
+    "owner": "RPDevs-Vault",
+    "name": "addons-linter",
+    "html_url": "https://github.com/RPDevs-Vault/addons-linter",
+    "description": "\ud83d\udd0d Firefox Add-ons linter, written in JavaScript. \ud83d\udc41",
+    "is_fork": true,
+    "dependency_files": {
+      "package.json": {
+        "type": "Node.js (NPM)",
+        "path": "package.json",
+        "html_url": "https://github.com/RPDevs-Vault/addons-linter/blob/master/package.json"
+      }
+    }
+  },
+  "RPDevs-Vault/cheat.sh": {
+    "owner": "RPDevs-Vault",
+    "name": "cheat.sh",
+    "html_url": "https://github.com/RPDevs-Vault/cheat.sh",
+    "description": "the only cheat sheet you need",
+    "is_fork": true,
+    "dependency_files": {
+      "Dockerfile": {
+        "type": "Docker Image",
+        "path": "Dockerfile",
+        "html_url": "https://github.com/RPDevs-Vault/cheat.sh/blob/master/Dockerfile"
+      },
+      "docker-compose.yml": {
+        "type": "Docker Compose",
+        "path": "docker-compose.yml",
+        "html_url": "https://github.com/RPDevs-Vault/cheat.sh/blob/master/docker-compose.yml"
+      },
+      "requirements.txt": {
+        "type": "Python (Pip)",
+        "path": "requirements.txt",
+        "html_url": "https://github.com/RPDevs-Vault/cheat.sh/blob/master/requirements.txt"
+      }
+    }
+  },
+  "RPDevs-Vault/script.module.myaccounts": {
+    "owner": "RPDevs-Vault",
+    "name": "script.module.myaccounts",
+    "html_url": "https://github.com/RPDevs-Vault/script.module.myaccounts",
+    "description": "",
+    "is_fork": true,
+    "dependency_files": {
+      "addon.xml": {
+        "type": "Kodi Addon",
+        "path": "addon.xml",
+        "html_url": "https://github.com/RPDevs-Vault/script.module.myaccounts/blob/master/addon.xml"
+      }
+    }
+  }
+}

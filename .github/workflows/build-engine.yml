@@ -168,8 +168,8 @@ jobs:
             PLATFORMS="${{ matrix.project.platforms && join(matrix.project.platforms, ',') || 'linux/amd64,linux/arm64' }}"
             
             docker buildx build --platform "$PLATFORMS" \
-              --cache-from type=local,src=/mnt/sharedroot/docker-cache \
-              --cache-to type=local,dest=/mnt/sharedroot/docker-cache,mode=max \
+              --cache-from type=local,src=/home/runner/shared/docker-cache \
+              --cache-to type=local,dest=/home/runner/shared/docker-cache,mode=max \
               -f "$DIR/$DOCKERFILE" -t "$IMAGE_NAME:latest" --push "$DIR"
           else
             echo "No Dockerfile found in $DIR. Skipping build."
