@@ -97,20 +97,6 @@
       }
     }
   },
-  "RPDevs-Builds/demo-repository": {
-    "owner": "RPDevs-Builds",
-    "name": "demo-repository",
-    "html_url": "https://github.com/RPDevs-Builds/demo-repository",
-    "description": "A code repository designed to show the best GitHub has to offer.",
-    "is_fork": false,
-    "dependency_files": {
-      "package.json": {
-        "type": "Node.js (NPM)",
-        "path": "package.json",
-        "html_url": "https://github.com/RPDevs-Builds/demo-repository/blob/main/package.json"
-      }
-    }
-  },
   "RPDevs-Builds/Otaku-Prod": {
     "owner": "RPDevs-Builds",
     "name": "Otaku-Prod",
@@ -197,25 +183,6 @@
         "type": "Node.js (NPM)",
         "path": "package.json",
         "html_url": "https://github.com/RPDevs-Vault/luci/blob/master/package.json"
-      }
-    }
-  },
-  "RPDevs-Vault/gcloud_php_netperf": {
-    "owner": "RPDevs-Vault",
-    "name": "gcloud_php_netperf",
-    "html_url": "https://github.com/RPDevs-Vault/gcloud_php_netperf",
-    "description": "cloud project connector",
-    "is_fork": false,
-    "dependency_files": {
-      "Dockerfile": {
-        "type": "Docker Image",
-        "path": "Dockerfile",
-        "html_url": "https://github.com/RPDevs-Vault/gcloud_php_netperf/blob/main/Dockerfile"
-      },
-      "requirements.txt": {
-        "type": "Python (Pip)",
-        "path": "requirements.txt",
-        "html_url": "https://github.com/RPDevs-Vault/gcloud_php_netperf/blob/main/requirements.txt"
       }
     }
   },
@@ -592,34 +559,6 @@
         "type": "Node.js (NPM)",
         "path": "package.json",
         "html_url": "https://github.com/RPDevs-Vault/map-of-reddit/blob/main/package.json"
-      }
-    }
-  },
-  "RPDevs-Vault/mega-embed-2": {
-    "owner": "RPDevs-Vault",
-    "name": "mega-embed-2",
-    "html_url": "https://github.com/RPDevs-Vault/mega-embed-2",
-    "description": "",
-    "is_fork": false,
-    "dependency_files": {
-      "package.json": {
-        "type": "Node.js (NPM)",
-        "path": "package.json",
-        "html_url": "https://github.com/RPDevs-Vault/mega-embed-2/blob/main/package.json"
-      }
-    }
-  },
-  "RPDevs-Vault/me2me2": {
-    "owner": "RPDevs-Vault",
-    "name": "me2me2",
-    "html_url": "https://github.com/RPDevs-Vault/me2me2",
-    "description": "",
-    "is_fork": false,
-    "dependency_files": {
-      "package.json": {
-        "type": "Node.js (NPM)",
-        "path": "package.json",
-        "html_url": "https://github.com/RPDevs-Vault/me2me2/blob/main/package.json"
       }
     }
   },
@@ -2645,20 +2584,6 @@
       }
     }
   },
-  "RPDevs-Vault/T430-Runner": {
-    "owner": "RPDevs-Vault",
-    "name": "T430-Runner",
-    "html_url": "https://github.com/RPDevs-Vault/T430-Runner",
-    "description": "",
-    "is_fork": false,
-    "dependency_files": {
-      "docker-compose.yml": {
-        "type": "Docker Compose",
-        "path": "docker-compose.yml",
-        "html_url": "https://github.com/RPDevs-Vault/T430-Runner/blob/main/docker-compose.yml"
-      }
-    }
-  },
   "RPDevs-Vault/rdt-client": {
     "owner": "RPDevs-Vault",
     "name": "rdt-client",
@@ -2801,20 +2726,6 @@
         "type": "Python (Poetry/Pip)",
         "path": "pyproject.toml",
         "html_url": "https://github.com/RPDevs-Vault/metube/blob/master/pyproject.toml"
-      }
-    }
-  },
-  "RPDevs-Vault/demo-repository": {
-    "owner": "RPDevs-Vault",
-    "name": "demo-repository",
-    "html_url": "https://github.com/RPDevs-Vault/demo-repository",
-    "description": "A code repository designed to show the best GitHub has to offer.",
-    "is_fork": false,
-    "dependency_files": {
-      "package.json": {
-        "type": "Node.js (NPM)",
-        "path": "package.json",
-        "html_url": "https://github.com/RPDevs-Vault/demo-repository/blob/main/package.json"
       }
     }
   },
