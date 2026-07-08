@@ -5,31 +5,36 @@ on:
 
 jobs:
   test-nfs-mount:
-    runs-on: ubuntu-latest
-    
+    runs-on:
+
+      group: linux-builders
+      labels:
+      - self-hosted
+      - linux
+      - lightweight
     steps:
-      - name: Mount Remote NFS Cache via Cloudflare Tunnel
-        env:
-          CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
-          CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-        run: |
-          echo "Installing NFS Common and Cloudflared..."
-          sudo apt-get update && sudo apt-get install -y nfs-common
-          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
-          sudo dpkg -i cloudflared.deb
-          
-          echo "Starting Cloudflare Tunnel mapping..."
-          export TUNNEL_SERVICE_TOKEN_ID=$CF_CLIENT_ID
-          export TUNNEL_SERVICE_TOKEN_SECRET=$CF_CLIENT_SECRET
-          cloudflared access tcp --hostname nfs-sharedroot.iamrp.dev --url 127.0.0.1:2049 &
-          
-          echo "Waiting for tunnel to initialize..."
-          sleep 10
-          
-          echo "Mounting NFS Share..."
-          mkdir -p /mnt/shared
-          sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot/github_runners/shared /mnt/shared
-          
-          echo "Verifying Mount Contents..."
-          ls -la /mnt/shared
-          df -h /mnt/shared
+    - name: Mount Remote NFS Cache via Cloudflare Tunnel
+      env:
+        CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+        CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+      run: |
+        echo "Installing NFS Common and Cloudflared..."
+        sudo apt-get update && sudo apt-get install -y nfs-common
+        curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+        sudo dpkg -i cloudflared.deb
+
+        echo "Starting Cloudflare Tunnel mapping..."
+        export TUNNEL_SERVICE_TOKEN_ID=$CF_CLIENT_ID
+        export TUNNEL_SERVICE_TOKEN_SECRET=$CF_CLIENT_SECRET
+        cloudflared access tcp --hostname nfs-sharedroot.iamrp.dev --url 127.0.0.1:2049 &
+
+        echo "Waiting for tunnel to initialize..."
+        sleep 10
+
+        echo "Mounting NFS Share..."
+        mkdir -p /mnt/shared
+        sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot/github_runners/shared /mnt/shared
+
+        echo "Verifying Mount Contents..."
+        ls -la /mnt/shared
+        df -h /mnt/shared

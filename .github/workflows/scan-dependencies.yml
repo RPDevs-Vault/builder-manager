@@ -2,7 +2,7 @@ name: Scan Organizations for Dependencies
 
 on:
   schedule:
-    - cron: '0 2 * * 0' # Weekly on Sunday at 2:00 AM
+  - cron: '0 2 * * 0'   # Weekly on Sunday at 2:00 AM
   workflow_dispatch:
 
 permissions:
@@ -11,33 +11,36 @@ permissions:
 jobs:
   scan-and-registry:
     name: Scan & Update Registry
-    runs-on: [self-hosted, linux64, lightweight]
+    runs-on:
+      group: linux-builders
+      labels: [self-hosted, linux64, lightweight]
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
 
-      - name: Run Dependency Scanner
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        run: python dependency/scan_dependencies.py
+    - name: Run Dependency Scanner
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GH_PAT || secrets.GITHUB_TOKEN
+          }}
+      run: python dependency/scan_dependencies.py
 
-      - name: Commit and Push Changes
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Only commit if dependency_registry.json has changes
-          if git status --porcelain | grep -q "dependency_registry.json"; then
-            git add dependency_registry.json
-            git commit -m "chore: auto-update dependency registry [skip ci]"
-            git pull origin main --rebase
-            git push origin main
-            echo "✅ Registry updated and pushed successfully."
-          else
-            echo "No changes in dependency registry. Skipping push."
-          fi
+    - name: Commit and Push Changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+        # Only commit if dependency_registry.json has changes
+        if git status --porcelain | grep -q "dependency_registry.json"; then
+          git add dependency_registry.json
+          git commit -m "chore: auto-update dependency registry [skip ci]"
+          git pull origin main --rebase
+          git push origin main
+          echo "✅ Registry updated and pushed successfully."
+        else
+          echo "No changes in dependency registry. Skipping push."
+        fi

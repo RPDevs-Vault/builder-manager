@@ -6,7 +6,7 @@ defaults:
 on:
   push:
     paths:
-      - 'container/dependencies/**'
+    - 'container/dependencies/**'
   workflow_dispatch:
     inputs:
       kodi_branch:
@@ -15,121 +15,131 @@ on:
         default: 'master'
         type: choice
         options:
-          - master
-          - Piers
-          - Omega
+        - master
+        - Piers
+        - Omega
 
 jobs:
   build-kodi-depends:
-    name: Build Kodi Dependencies (${{ matrix.platform }} - ${{ matrix.host_triplet }})
+    name: Build Kodi Dependencies (${{ matrix.platform }} - ${{ 
+      matrix.host_triplet }})
     runs-on: ${{ fromJSON(matrix.runner) }}
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: linux
-            host_triplet: x86_64-linux-gnu
-            arch_name: linux-x86_64
-            runner: '["self-hosted", "linux", "heavy"]'
-          - platform: linux
-            host_triplet: aarch64-linux-gnu
-            arch_name: linux-arm64
-            runner: '["self-hosted", "linux", "heavy"]'
-          - platform: android
-            host_triplet: aarch64-linux-android
-            arch_name: android-arm64
-            runner: '["self-hosted", "linux", "heavy"]'
-          - platform: osx64
-            host_triplet: x86_64-apple-darwin
-            arch_name: osx64
-            runner: '"macos-latest"'
-          - platform: ios
-            host_triplet: aarch64-apple-darwin
-            arch_name: ios
-            runner: '"macos-latest"'
-          - platform: tvos
-            host_triplet: aarch64-apple-darwin
-            arch_name: tvos
-            runner: '"macos-latest"'
-          - platform: win64
-            host_triplet: x86_64-w64-mingw32
-            arch_name: win64
-            runner: '"windows-2022"'
+        - platform: linux
+          host_triplet: x86_64-linux-gnu
+          arch_name: linux-x86_64
+          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux",
+            "heavy"]}'
+        - platform: linux
+          host_triplet: aarch64-linux-gnu
+          arch_name: linux-arm64
+          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux",
+            "heavy"]}'
+        - platform: android
+          host_triplet: aarch64-linux-android
+          arch_name: android-arm64
+          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux",
+            "heavy"]}'
+        - platform: osx64
+          host_triplet: x86_64-apple-darwin
+          arch_name: osx64
+          runner: '{"group": "macos-builders", "labels": ["macos-latest"]}'
+        - platform: ios
+          host_triplet: aarch64-apple-darwin
+          arch_name: ios
+          runner: '{"group": "macos-builders", "labels": ["macos-latest"]}'
+        - platform: tvos
+          host_triplet: aarch64-apple-darwin
+          arch_name: tvos
+          runner: '{"group": "macos-builders", "labels": ["macos-latest"]}'
+        - platform: win64
+          host_triplet: x86_64-w64-mingw32
+          arch_name: win64
+          runner: '{"group": "windows-builders", "labels": ["windows-2022"]}'
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+    - name: Checkout Repository
+      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5   # v4
 
-      - name: Setup Build Environment (Linux/Android)
-        if: matrix.platform == 'linux' || matrix.platform == 'android'
-        run: |
-          sudo apt-get update || true
-          sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre || true
+    - name: Setup Build Environment (Linux/Android)
+      if: matrix.platform == 'linux' || matrix.platform == 'android'
+      run: |
+        sudo apt-get update || true
+        sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre || true
 
-      - name: Setup Build Environment (macOS/iOS/tvOS)
-        if: matrix.platform == 'osx64' || matrix.platform == 'ios' || matrix.platform == 'tvos'
-        run: brew install cmake ninja nasm gettext coreutils groff
+    - name: Setup Build Environment (macOS/iOS/tvOS)
+      if: matrix.platform == 'osx64' || matrix.platform == 'ios' || 
+        matrix.platform == 'tvos'
+      run: brew install cmake ninja nasm gettext coreutils groff
 
-      - name: Build Dependencies (Unix)
-        if: matrix.platform != 'win64'
-        id: build_step
-        env:
-          CCACHE_DIR: /home/runner/.ccache
-        run: |
-          chmod +x dependencies/kodi/build.sh
-          cd dependencies/kodi
-          BRANCH="${{ github.event.inputs.kodi_branch || 'master' }}"
-          echo "Starting build for ${{ matrix.arch_name }} (branch: $BRANCH). Logging to build.log..."
-          ./build.sh ${{ matrix.platform }} ${{ matrix.host_triplet }} "$BRANCH" > build.log 2>&1 || {
-            echo "::error::Build failed. Last 100 lines:"
-            tail -n 100 build.log
-            exit 1
-          }
-          echo "Build succeeded. Last 50 lines:"
-          tail -n 50 build.log
+    - name: Build Dependencies (Unix)
+      if: matrix.platform != 'win64'
+      id: build_step
+      env:
+        CCACHE_DIR: /home/runner/.ccache
+      run: |
+        chmod +x dependencies/kodi/build.sh
+        cd dependencies/kodi
+        BRANCH="${{ github.event.inputs.kodi_branch || 'master' }}"
+        echo "Starting build for ${{ matrix.arch_name }} (branch: $BRANCH). Logging to build.log..."
+        ./build.sh ${{ matrix.platform }} ${{ matrix.host_triplet }} "$BRANCH" > build.log 2>&1 || {
+          echo "::error::Build failed. Last 100 lines:"
+          tail -n 100 build.log
+          exit 1
+        }
+        echo "Build succeeded. Last 50 lines:"
+        tail -n 50 build.log
 
-      - name: Build Dependencies (Windows)
-        if: matrix.platform == 'win64'
-        shell: cmd
-        run: |
-          git clone --depth 1 --branch "${{ github.event.inputs.kodi_branch || 'master' }}" https://github.com/xbmc/xbmc.git xbmc
-          cd xbmc\tools\buildsteps\windows\x64
-          call download-dependencies.bat
-          mkdir ..\..\..\..\..\compiled-artifacts
-          xcopy /E /I /Y %GITHUB_WORKSPACE%\container\xbmc\project\BuildDependencies %GITHUB_WORKSPACE%\container\dependencies\kodi\compiled-artifacts
+    - name: Build Dependencies (Windows)
+      if: matrix.platform == 'win64'
+      shell: cmd
+      run: |
+        git clone --depth 1 --branch "${{ github.event.inputs.kodi_branch || 'master' }}" https://github.com/xbmc/xbmc.git xbmc
+        cd xbmc\tools\buildsteps\windows\x64
+        call download-dependencies.bat
+        mkdir ..\..\..\..\..\compiled-artifacts
+        xcopy /E /I /Y %GITHUB_WORKSPACE%\container\xbmc\project\BuildDependencies %GITHUB_WORKSPACE%\container\dependencies\kodi\compiled-artifacts
 
-      - name: Upload Build Log on Failure
-        if: failure() && steps.build_step.outcome == 'failure'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: build-log-${{ matrix.arch_name }}
-          path: container/dependencies/kodi/build.log
+    - name: Upload Build Log on Failure
+      if: failure() && steps.build_step.outcome == 'failure'
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02   # v4
+      with:
+        name: build-log-${{ matrix.arch_name }}
+        path: container/dependencies/kodi/build.log
 
-      - name: Package Toolchain
-        run: |
-          cd dependencies/kodi/compiled-artifacts
-          tar -czvf ../../../kodi-dependencies-${{ matrix.arch_name }}.tar.gz .
+    - name: Package Toolchain
+      run: |
+        cd dependencies/kodi/compiled-artifacts
+        tar -czvf ../../../kodi-dependencies-${{ matrix.arch_name }}.tar.gz .
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: kodi-dependencies-${{ matrix.arch_name }}
-          path: container/kodi-dependencies-${{ matrix.arch_name }}.tar.gz
-          retention-days: 14
+    - name: Upload Artifact
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02   # v4
+      with:
+        name: kodi-dependencies-${{ matrix.arch_name }}
+        path: container/kodi-dependencies-${{ matrix.arch_name }}.tar.gz
+        retention-days: 14
 
   dispatch-to-distributor:
     name: Dispatch to Distributor
     needs: build-kodi-depends
-    runs-on: ubuntu-latest
+    runs-on:
+      group: linux-builders
+      labels:
+      - self-hosted
+      - linux
+      - lightweight
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Emit Repository Dispatch
-        env:
-          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
-        run: |
-          echo "Dispatching to distributor-manager..."
-          gh api -X POST /repos/RPDevs-Vault/delivery-manager/dispatches \
-            -f event_type='publish_artifact' \
-            -f client_payload[run_id]="${{ github.run_id }}" \
-            -f client_payload[project]="kodi-dependencies"
-          echo "Dispatch emitted successfully."
+    - name: Emit Repository Dispatch
+      env:
+        GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+      run: |
+        echo "Dispatching to distributor-manager..."
+        gh api -X POST /repos/RPDevs-Vault/delivery-manager/dispatches \
+          -f event_type='publish_artifact' \
+          -f client_payload[run_id]="${{ github.run_id }}" \
+          -f client_payload[project]="kodi-dependencies"
+        echo "Dispatch emitted successfully."

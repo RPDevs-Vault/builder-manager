@@ -6,56 +6,58 @@ concurrency:
 
 on:
   schedule:
-    - cron: '0 13 * * 0' # Weekly on Sunday at 13:00
+  - cron: '0 13 * * 0'   # Weekly on Sunday at 13:00
   workflow_dispatch:
 
 jobs:
   cleanup:
-    runs-on: [self-hosted, linux, lightweight]
+    runs-on:
+      group: linux-builders
+      labels: [self-hosted, linux, lightweight]
     steps:
-      - name: Prune Stale GHCR Images
-        env:
-          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
-        run: |
-          # 1. Get all container packages
-          PACKAGES=$(gh api /orgs/RPDevs-Vault/packages?package_type=container --paginate --jq '.[].name')
+    - name: Prune Stale GHCR Images
+      env:
+        GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+      run: |
+        # 1. Get all container packages
+        PACKAGES=$(gh api /orgs/RPDevs-Vault/packages?package_type=container --paginate --jq '.[].name')
+
+        NOW=$(date +%s)
+        # 90 days in seconds
+        NINETY_DAYS=7776000
+
+        for pkg in $PACKAGES; do
+          echo "Cleaning up $pkg..."
           
-          NOW=$(date +%s)
-          # 90 days in seconds
-          NINETY_DAYS=7776000
-
-          for pkg in $PACKAGES; do
-            echo "Cleaning up $pkg..."
+          # Fetch all versions for the package
+          VERSIONS=$(gh api "/orgs/RPDevs-Vault/packages/container/$pkg/versions" --paginate)
+          
+          echo "$VERSIONS" | jq -c '.[]' | while read -r ver; do
+            ID=$(echo "$ver" | jq -r '.id')
+            TAGS=$(echo "$ver" | jq -r '.metadata.container.tags | length')
+            UPDATED=$(echo "$ver" | jq -r '.updated_at')
             
-            # Fetch all versions for the package
-            VERSIONS=$(gh api "/orgs/RPDevs-Vault/packages/container/$pkg/versions" --paginate)
-            
-            echo "$VERSIONS" | jq -c '.[]' | while read -r ver; do
-              ID=$(echo "$ver" | jq -r '.id')
-              TAGS=$(echo "$ver" | jq -r '.metadata.container.tags | length')
-              UPDATED=$(echo "$ver" | jq -r '.updated_at')
-              
-              UPDATED_SEC=$(date -d "$UPDATED" +%s)
-              DIFF=$((NOW - UPDATED_SEC))
+            UPDATED_SEC=$(date -d "$UPDATED" +%s)
+            DIFF=$((NOW - UPDATED_SEC))
 
-              DELETE=false
-              REASON=""
+            DELETE=false
+            REASON=""
 
-              # Rule A: Delete untagged images (usually failed builds or overwritten layers)
-              if [[ $TAGS -eq 0 ]]; then
-                DELETE=true
-                REASON="Untagged image"
-              fi
+            # Rule A: Delete untagged images (usually failed builds or overwritten layers)
+            if [[ $TAGS -eq 0 ]]; then
+              DELETE=true
+              REASON="Untagged image"
+            fi
 
-              # Rule B: Delete versions older than 90 days (if not manually pinned)
-              if [[ $DIFF -gt $NINETY_DAYS ]]; then
-                DELETE=true
-                REASON="Older than 90 days (Last update: $UPDATED)"
-              fi
+            # Rule B: Delete versions older than 90 days (if not manually pinned)
+            if [[ $DIFF -gt $NINETY_DAYS ]]; then
+              DELETE=true
+              REASON="Older than 90 days (Last update: $UPDATED)"
+            fi
 
-              if [[ "$DELETE" == "true" ]]; then
-                echo "Deleting version $ID of $pkg: $REASON"
-                gh api -X DELETE "/orgs/RPDevs-Vault/packages/container/$pkg/versions/$ID" --silent || echo "Failed to delete $ID"
-              fi
-            done
+            if [[ "$DELETE" == "true" ]]; then
+              echo "Deleting version $ID of $pkg: $REASON"
+              gh api -X DELETE "/orgs/RPDevs-Vault/packages/container/$pkg/versions/$ID" --silent || echo "Failed to delete $ID"
+            fi
           done
+        done

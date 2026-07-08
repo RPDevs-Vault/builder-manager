@@ -6,39 +6,41 @@ concurrency:
 
 on:
   schedule:
-    - cron: '0 0 * * 1' # Weekly on Monday at 00:00
+  - cron: '0 0 * * 1'   # Weekly on Monday at 00:00
   workflow_dispatch:
 
 jobs:
   audit:
-    runs-on: [self-hosted, linux, lightweight]
+    runs-on:
+      group: linux-builders
+      labels: [self-hosted, linux, lightweight]
     steps:
-      - name: Audit Organization Packages
-        env:
-          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
-        run: |
-          # Fetch all container packages in the organization
-          PACKAGES=$(gh api /orgs/RPDevs-Vault/packages?package_type=container --paginate)
+    - name: Audit Organization Packages
+      env:
+        GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+      run: |
+        # Fetch all container packages in the organization
+        PACKAGES=$(gh api /orgs/RPDevs-Vault/packages?package_type=container --paginate)
+
+        if [[ $(echo "$PACKAGES" | jq 'length') -eq 0 ]]; then
+          echo "No container packages found in the organization registry. ✅"
+          exit 0
+        fi
+
+        REPORT="ghcr_audit_report.md"
+        echo "## 📦 GHCR Package Audit - $(date)" > $REPORT
+        echo "| Package Name | Visibility | Versions | Last Updated |" >> $REPORT
+        echo "| :--- | :--- | :--- | :--- |" >> $REPORT
+
+        echo "$PACKAGES" | jq -c '.[]' | while read -r pkg; do
+          NAME=$(echo "$pkg" | jq -r '.name')
+          VISIBILITY=$(echo "$pkg" | jq -r '.visibility')
+          UPDATED=$(echo "$pkg" | jq -r '.updated_at')
           
-          if [[ $(echo "$PACKAGES" | jq 'length') -eq 0 ]]; then
-            echo "No container packages found in the organization registry. ✅"
-            exit 0
-          fi
+          # Fetch version count
+          VERSIONS=$(gh api "/orgs/RPDevs-Vault/packages/container/$NAME/versions" --jq 'length')
+          
+          echo "| \`$NAME\` | $VISIBILITY | $VERSIONS | $UPDATED |" >> $REPORT
+        done
 
-          REPORT="ghcr_audit_report.md"
-          echo "## 📦 GHCR Package Audit - $(date)" > $REPORT
-          echo "| Package Name | Visibility | Versions | Last Updated |" >> $REPORT
-          echo "| :--- | :--- | :--- | :--- |" >> $REPORT
-
-          echo "$PACKAGES" | jq -c '.[]' | while read -r pkg; do
-            NAME=$(echo "$pkg" | jq -r '.name')
-            VISIBILITY=$(echo "$pkg" | jq -r '.visibility')
-            UPDATED=$(echo "$pkg" | jq -r '.updated_at')
-            
-            # Fetch version count
-            VERSIONS=$(gh api "/orgs/RPDevs-Vault/packages/container/$NAME/versions" --jq 'length')
-            
-            echo "| \`$NAME\` | $VISIBILITY | $VERSIONS | $UPDATED |" >> $REPORT
-          done
-
-          gh issue create --repo RPDevs-Vault/container-manager --title "Weekly GHCR Audit Report" --body-file $REPORT --label "maintenance"
+        gh issue create --repo RPDevs-Vault/container-manager --title "Weekly GHCR Audit Report" --body-file $REPORT --label "maintenance"

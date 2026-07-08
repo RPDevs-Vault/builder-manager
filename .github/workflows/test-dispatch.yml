@@ -2,6 +2,8 @@ name: Test Dispatch
 on: [workflow_dispatch]
 jobs:
   test:
-    runs-on: [self-hosted, linux, lightweight]
+    runs-on:
+      group: linux-builders
+      labels: [self-hosted, linux, lightweight]
     steps:
-      - run: echo "Success"
+    - run: echo "Success"

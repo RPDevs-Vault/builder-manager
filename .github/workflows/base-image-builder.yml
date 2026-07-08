@@ -2,12 +2,12 @@ name: Base Image Builder
 
 on:
   schedule:
-    - cron: '0 4 * * 1' # Weekly on Mondays at 04:00
+  - cron: '0 4 * * 1'   # Weekly on Mondays at 04:00
   push:
     branches:
-      - main
+    - main
     paths:
-      - 'container/base-images/**'
+    - 'container/base-images/**'
   workflow_dispatch:
 
 env:
@@ -17,7 +17,9 @@ env:
 jobs:
   build-and-scan:
     name: Build & Scan Base Images
-    runs-on: [self-hosted, linux, heavy]
+    runs-on:
+      group: linux-builders
+      labels: [self-hosted, linux, heavy]
     permissions:
       contents: read
       packages: write
@@ -29,49 +31,49 @@ jobs:
       fail-fast: false
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.SYNC_TOKEN }}
+    - name: Log in to the Container registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.SYNC_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.ORG }}/base-${{ matrix.image }}
-          tags: |
-            type=raw,value=latest
-            type=sha,format=short
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.ORG }}/base-${{ matrix.image }}
+        tags: |
+          type=raw,value=latest
+          type=sha,format=short
 
-      - name: Build Docker image (load locally for scanning)
-        uses: docker/build-push-action@v5
-        with:
-          context: ./container/base-images/${{ matrix.image }}
-          load: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+    - name: Build Docker image (load locally for scanning)
+      uses: docker/build-push-action@v5
+      with:
+        context: ./container/base-images/${{ matrix.image }}
+        load: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: '${{ env.REGISTRY }}/${{ env.ORG }}/base-${{ matrix.image }}:latest'
-          format: 'sarif'
-          output: 'trivy-results-${{ matrix.image }}.sarif'
-          severity: 'CRITICAL,HIGH'
-          exit-code: '0' # Don't break the build yet, just report
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: '${{ env.REGISTRY }}/${{ env.ORG }}/base-${{ matrix.image }}:latest'
+        format: 'sarif'
+        output: 'trivy-results-${{ matrix.image }}.sarif'
+        severity: 'CRITICAL,HIGH'
+        exit-code: '0'   # Don't break the build yet, just report
 
-      - name: Push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: ./container/base-images/${{ matrix.image }}
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+    - name: Push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./container/base-images/${{ matrix.image }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
