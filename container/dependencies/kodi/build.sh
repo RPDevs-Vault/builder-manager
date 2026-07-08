@@ -34,10 +34,18 @@ if command -v ccache >/dev/null 2>&1 && [ -n "$CCACHE_DIR" ]; then
   ccache -s
 fi
 
-# 3. Bootstrap
+# 3. Apply Apple-specific patches
+if [[ "$PLATFORM" == "osx64" || "$PLATFORM" == "ios" || "$PLATFORM" == "tvos" ]]; then
+  echo "Applying Darwin kernel version and ASM patches..."
+  sed -i '' 's/$(MAKE) -C $(PLATFORM)/mkdir -p $(PLATFORM)\/src\/syscfg \&\& cp -v $(PLATFORM)\/src\/syscfg\/lock-obj-pub.aarch64-apple-darwin.h $(PLATFORM)\/src\/syscfg\/lock-obj-pub.darwin24.6.0.h || true \&\& $(MAKE) -C $(PLATFORM)/' target/libgpg-error/Makefile || true
+  sed -i '' 's/$(CONFIGURE)/$(CONFIGURE) --disable-asm/' target/libgcrypt/Makefile || true
+  sed -i '' 's/export LIBS=.*/export LIBS=$(LINK_ICONV) -lintl/' target/python3/Makefile || true
+fi
+
+# 4. Bootstrap
 ./bootstrap
 
-# 4. Build platform-specific configure flags
+# 5. Build platform-specific configure flags
 PREFIX_DIR="$(pwd)/../../../../compiled-artifacts"
 mkdir -p "$PREFIX_DIR"
 
@@ -63,6 +71,9 @@ case "$PLATFORM" in
     echo "Using Android NDK: $NDK_PATH"
     CONFIG_FLAGS="$CONFIG_FLAGS --with-platform=android --with-sdk-path=$SDK_PATH --with-ndk-path=$NDK_PATH"
     ;;
+  osx64)
+    CONFIG_FLAGS="$CONFIG_FLAGS --with-platform=macos"
+    ;;
   *)
     CONFIG_FLAGS="$CONFIG_FLAGS --with-platform=$PLATFORM"
     ;;
@@ -71,10 +82,10 @@ esac
 echo "Configure flags: $CONFIG_FLAGS"
 ./configure $CONFIG_FLAGS
 
-# 5. Build with all available cores
-make -j$(nproc)
+# 6. Build with all available cores
+make -j$(nproc || sysctl -n hw.ncpu)
 
-# 6. Report ccache stats
+# 7. Report ccache stats
 if command -v ccache >/dev/null 2>&1 && [ -n "$CCACHE_DIR" ]; then
   echo ""
   echo "=== ccache statistics ==="
