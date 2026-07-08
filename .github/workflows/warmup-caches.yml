@@ -14,6 +14,9 @@ jobs:
         run: |
           echo "Warming up NPM cache..."
           mkdir -p ~/.npm
+          # Set prefix to home folder to avoid global permission errors
+          mkdir -p ~/.npm-global
+          npm config set prefix ~/.npm-global
           # Install common tools to populate the shared npm cache
           npm install -g npm@latest
           npm cache verify
