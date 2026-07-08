@@ -28,7 +28,7 @@ jobs:
           
           echo "Mounting NFS Share..."
           mkdir -p /home/runner/shared
-          sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot /home/runner/shared
+          sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot/github_runners/shared /home/runner/shared
           
           echo "Verifying Mount Contents..."
           ls -la /home/runner/shared
