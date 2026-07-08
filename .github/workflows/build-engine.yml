@@ -1,4 +1,7 @@
 name: Container Build Engine
+defaults:
+  run:
+    working-directory: container
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -7,11 +10,11 @@ concurrency:
 on:
   push:
     paths:
-      - 'build/**'
-      - 'images/**'
-      - 'runners/**'
-      - 'manifest.yaml'
-      - 'thirdparty.yaml'
+      - 'container/build/**'
+      - 'container/images/**'
+      - 'container/runners/**'
+      - 'container/manifest.yaml'
+      - 'container/thirdparty.yaml'
   workflow_dispatch:
 
 jobs:

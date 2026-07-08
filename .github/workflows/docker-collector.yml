@@ -1,4 +1,7 @@
 name: Docker Collector
+defaults:
+  run:
+    working-directory: container
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -94,5 +97,5 @@ jobs:
 
           # Post summary to an issue if new assets were found
           if [ -f discovery_report.md ]; then
-            gh issue create --repo RPDevs-Vault/container-manager --title "Weekly Docker Asset Collection Summary" --body-file discovery_report.md --label "enhancement"
+            gh issue create --repo RPDevs-Vault/builder-manager --title "Weekly Docker Asset Collection Summary" --body-file discovery_report.md --label "enhancement"
           fi

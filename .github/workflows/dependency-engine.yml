@@ -1,9 +1,12 @@
 name: Dependency Build Engine
+defaults:
+  run:
+    working-directory: container
 
 on:
   push:
     paths:
-      - 'dependencies/**'
+      - 'container/dependencies/**'
   workflow_dispatch:
     inputs:
       kodi_branch:
@@ -65,7 +68,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: build-log-${{ matrix.arch_name }}
-          path: dependencies/kodi/build.log
+          path: container/dependencies/kodi/build.log
 
       - name: Package Toolchain
         run: |
@@ -76,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: kodi-dependencies-${{ matrix.arch_name }}
-          path: kodi-dependencies-${{ matrix.arch_name }}.tar.gz
+          path: container/kodi-dependencies-${{ matrix.arch_name }}.tar.gz
           retention-days: 14
 
   dispatch-to-distributor:
@@ -90,7 +93,7 @@ jobs:
           GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
         run: |
           echo "Dispatching to distributor-manager..."
-          gh api -X POST /repos/RPDevs-Vault/distributor-manager/dispatches \
+          gh api -X POST /repos/RPDevs-Vault/delivery-manager/dispatches \
             -f event_type='publish_artifact' \
             -f client_payload[run_id]="${{ github.run_id }}" \
             -f client_payload[project]="kodi-dependencies"

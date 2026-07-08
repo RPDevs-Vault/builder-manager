@@ -24,7 +24,7 @@ jobs:
       - name: Run Dependency Scanner
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        run: python scan_dependencies.py
+        run: python dependency/scan_dependencies.py
 
       - name: Commit and Push Changes
         run: |

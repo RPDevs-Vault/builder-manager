@@ -7,7 +7,7 @@ on:
     branches:
       - main
     paths:
-      - 'base-images/**'
+      - 'container/base-images/**'
   workflow_dispatch:
 
 env:
@@ -54,7 +54,7 @@ jobs:
       - name: Build Docker image (load locally for scanning)
         uses: docker/build-push-action@v5
         with:
-          context: ./base-images/${{ matrix.image }}
+          context: ./container/base-images/${{ matrix.image }}
           load: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -71,7 +71,7 @@ jobs:
       - name: Push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./base-images/${{ matrix.image }}
+          context: ./container/base-images/${{ matrix.image }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
