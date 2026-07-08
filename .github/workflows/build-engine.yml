@@ -148,6 +148,7 @@ jobs:
             git add .
             if ! git diff --staged --quiet; then
               git commit -m "chore(archiver): update $NAME source and assets"
+              git pull origin main --rebase
               git push origin main
             fi
           fi
