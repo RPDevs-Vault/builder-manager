@@ -19,8 +19,8 @@ jobs:
           sudo dpkg -i cloudflared.deb
           
           echo "Starting Cloudflare Tunnel mapping..."
-          export TUNNEL_SERVICE_AUTH_ID=$CF_CLIENT_ID
-          export TUNNEL_SERVICE_AUTH_SECRET=$CF_CLIENT_SECRET
+          export TUNNEL_SERVICE_TOKEN_ID=$CF_CLIENT_ID
+          export TUNNEL_SERVICE_TOKEN_SECRET=$CF_CLIENT_SECRET
           cloudflared access tcp --hostname nfs-sharedroot.iamrp.dev --url 127.0.0.1:2049 &
           
           echo "Waiting for tunnel to initialize..."
