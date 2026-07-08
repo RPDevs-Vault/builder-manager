@@ -1,0 +1,1 @@
+docker run -d --name RPDevs-Vault_rdt-client ghcr.io/rpdevs-vault/rpdevs-vault_rdt-client:latest

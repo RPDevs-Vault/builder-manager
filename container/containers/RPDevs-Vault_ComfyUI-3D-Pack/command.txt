@@ -1,0 +1,1 @@
+docker run -d --name RPDevs-Vault_ComfyUI-3D-Pack ghcr.io/rpdevs-vault/rpdevs-vault_comfyui-3d-pack:latest

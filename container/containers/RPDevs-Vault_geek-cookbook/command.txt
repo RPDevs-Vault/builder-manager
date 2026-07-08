@@ -1,0 +1,1 @@
+docker run -d --name RPDevs-Vault_geek-cookbook ghcr.io/rpdevs-vault/rpdevs-vault_geek-cookbook:latest

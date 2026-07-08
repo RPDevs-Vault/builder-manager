@@ -1,0 +1,1 @@
+docker run -d --name RPDevs-Vault_send ghcr.io/rpdevs-vault/rpdevs-vault_send:latest

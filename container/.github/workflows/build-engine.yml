@@ -1,0 +1,178 @@
+name: Container Build Engine
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  push:
+    paths:
+      - 'build/**'
+      - 'images/**'
+      - 'runners/**'
+      - 'manifest.yaml'
+      - 'thirdparty.yaml'
+  workflow_dispatch:
+
+jobs:
+  setup-matrix:
+    name: Fleet Matrix Setup
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      runner: ${{ steps.check-runner.outputs.runner }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - id: check-runner
+        name: Check Local Runner Status
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          RUNNER_STATUS=$(gh api /orgs/RPDevs-Vault/actions/runners --jq '.runners[] | select(.labels[].name == "vault-builder") | .status' | grep "online" | head -n 1)
+          if [ "$RUNNER_STATUS" == "online" ]; then
+            echo "runner=[\"self-hosted\", \"vault-builder\"]" >> $GITHUB_OUTPUT
+            echo "Selected local vault-builder runner."
+          else
+            echo "runner=\"ubuntu-latest\"" >> $GITHUB_OUTPUT
+            echo "Local runner offline. Falling back to ubuntu-latest."
+          fi
+
+      - id: set-matrix
+        name: Generate Build Matrix
+        run: |
+          # 1. Collect local builds
+          LOCAL_JSON=$(ls -d build/*/ 2>/dev/null | xargs -n 1 basename | jq -R -s -c 'split("\n")[:-1] | map({name: ., source: "local", dir: "build/\(.)"})')
+          if [ -z "$LOCAL_JSON" ]; then LOCAL_JSON="[]"; fi
+
+          # 2. Collect runners
+          RUNNER_JSON=$(ls -d runners/*/ 2>/dev/null | xargs -n 1 basename | jq -R -s -c 'split("\n")[:-1] | map({name: "runner-\(.)", source: "runner", dir: "runners/\(.)"})')
+          if [ -z "$RUNNER_JSON" ]; then RUNNER_JSON="[]"; fi
+
+          # 3. Collect manifest projects
+          MANIFEST_JSON=$(yq -o=json -c '.projects // []' manifest.yaml | jq -c 'map(. + {source: "manifest", dir: "build/\(.name)"})')
+          
+          # Merge all into a single array and ensure unique projects by name
+          FULL_MATRIX=$(echo "$LOCAL_JSON $RUNNER_JSON $MANIFEST_JSON" | jq -s -c 'add | unique_by(.name) | if length == 0 then [{"name":"dummy","source":"dummy","dir":"dummy"}] else . end')
+          echo "matrix=$FULL_MATRIX" >> $GITHUB_OUTPUT
+
+  build:
+    name: Build (${{ matrix.project.name }})
+    needs: setup-matrix
+    if: needs.setup-matrix.outputs.matrix != '[]' && needs.setup-matrix.outputs.matrix != ''
+    strategy:
+      fail-fast: false
+      matrix: 
+        project: ${{ fromJSON(needs.setup-matrix.outputs.matrix) }}
+    
+    runs-on: ${{ fromJSON(needs.setup-matrix.outputs.runner) }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          token: ${{ secrets.SYNC_TOKEN }}
+
+      - name: Pre-Flight Validation
+        run: |
+          if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
+          echo "Checking environment for ${{ matrix.project.name }}..."
+          DIR="${{ matrix.project.dir }}"
+          
+          if [[ "${{ matrix.project.source }}" == "local" || "${{ matrix.project.source }}" == "runner" ]]; then
+            if [ ! -d "$DIR" ]; then
+              echo "::error::Source directory $DIR not found!"
+              exit 1
+            fi
+          fi
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.SYNC_TOKEN }}
+
+      - name: Prepare Source
+        run: |
+          if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
+          NAME="${{ matrix.project.name }}"
+          DIR="${{ matrix.project.dir }}"
+          URL="${{ matrix.project.source_url || matrix.project.url }}"
+          BRANCH="${{ matrix.project.branch || 'main' }}"
+          
+          if [[ "${{ matrix.project.source }}" == "manifest" || "${{ matrix.project.source }}" == "thirdparty" ]]; then
+            echo "Cloning $NAME from $URL ($BRANCH)..."
+            mkdir -p build
+            rm -rf "$DIR"
+            git clone --depth 1 --branch "$BRANCH" "$URL" "$DIR" || \
+            git clone --depth 1 --branch "master" "$URL" "$DIR" || echo "Failed to clone $NAME"
+          fi
+
+      - name: Archive and Organize
+        run: |
+          if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
+          NAME="${{ matrix.project.name }}"
+          DIR="${{ matrix.project.dir }}"
+          
+          if [ -d "$DIR" ]; then
+            rm -rf "$DIR/.git" 2>/dev/null || true
+            mkdir -p "containers/$NAME"
+            IMAGE_NAME="ghcr.io/rpdevs-vault/${NAME,,}"
+            
+            echo "docker run -d --name $NAME $IMAGE_NAME:latest" > "containers/$NAME/command.txt"
+            
+            echo "# 📦 $NAME" > "containers/$NAME/README.md"
+            echo "- **Image:** \`$IMAGE_NAME:latest\`" >> "containers/$NAME/README.md"
+            echo "- **Type:** ${{ matrix.project.source }}" >> "containers/$NAME/README.md"
+            echo "- **Registry:** [GHCR](https://github.com/orgs/RPDevs-Vault/packages/container/${NAME,,})" >> "containers/$NAME/README.md"
+            echo "- **Last Built:** \$(date)" >> "containers/$NAME/README.md"
+
+            mkdir -p images
+            echo "# 📦 $NAME" > "images/$NAME.md"
+            echo "Image: \`$IMAGE_NAME:latest\`" >> "images/$NAME.md"
+            echo "Registry: [GHCR](https://github.com/orgs/RPDevs-Vault/packages/container/${NAME,,})" >> "images/$NAME.md"
+
+            git config user.name "Fleet Archiver"
+            git config user.email "actions@github.com"
+            git add .
+            if ! git diff --staged --quiet; then
+              git commit -m "chore(archiver): update $NAME source and assets"
+              git push origin main
+            fi
+          fi
+
+      - name: Build and Push
+        run: |
+          if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
+          NAME="${{ matrix.project.name }}"
+          DIR="${{ matrix.project.dir }}"
+          IMAGE_NAME="ghcr.io/rpdevs-vault/${NAME,,}"
+          
+          if [ -f "$DIR/Dockerfile" ] || [ -f "$DIR/dockerfile" ]; then
+            echo "Building $NAME..."
+            DOCKERFILE=$(ls "$DIR" | grep -i "^dockerfile$" | head -n 1)
+            
+            # Extract platforms from manifest or default to amd64,arm64
+            PLATFORMS="${{ matrix.project.platforms && join(matrix.project.platforms, ',') || 'linux/amd64,linux/arm64' }}"
+            
+            docker buildx build --platform "$PLATFORMS" \
+              --cache-from type=local,src=/mnt/sharedroot/docker-cache \
+              --cache-to type=local,dest=/mnt/sharedroot/docker-cache,mode=max \
+              -f "$DIR/$DOCKERFILE" -t "$IMAGE_NAME:latest" --push "$DIR"
+          else
+            echo "No Dockerfile found in $DIR. Skipping build."
+          fi
+
+      - name: Runner Housekeeping
+        if: always() && contains(runner.labels, 'self-hosted')
+        run: |
+          echo "Pruning temporary build images..."
+          docker image prune -f --filter "label=com.github.actions.runner" || true

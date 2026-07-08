@@ -1,0 +1,1 @@
+docker run -d --name RPDevs-Vault_mail-for-good ghcr.io/rpdevs-vault/rpdevs-vault_mail-for-good:latest

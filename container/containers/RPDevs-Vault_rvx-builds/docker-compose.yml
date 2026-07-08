@@ -1,0 +1,8 @@
+services:
+  revanced:
+    image: imxeren/docker-py-revanced
+    container_name: revanced-builder
+    env_file:
+      - .env
+    volumes:
+      - .:/app:z

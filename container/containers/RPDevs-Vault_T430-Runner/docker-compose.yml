@@ -1,0 +1,40 @@
+services:
+  t430-builder:
+    image: ghcr.io/rpdevs-vault/runner-linux-builder:latest
+    container_name: t430-linux-builder
+    restart: always
+    environment:
+      - GH_OWNER=RPDevs-Vault
+      - GH_TOKEN=${GH_PAT}
+      - RUNNER_NAME=t430-runner-01
+      - RUNNER_LABELS=self-hosted,linux,t430
+    volumes:
+      - /mnt/data/github-runners/t430-linux-builder/work:/home/runner/_work
+      - /var/run/docker.sock:/var/run/docker.sock
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '3'
+          memory: 6G
+
+  t430-lite-builder:
+    image: ghcr.io/rpdevs-vault/runner-linux-builder:latest
+    container_name: t430-lite-linux-builder
+    restart: always
+    environment:
+      - GH_OWNER=RPDevs-Vault
+      - GH_TOKEN=${GH_PAT}
+      - RUNNER_NAME=t430-lite-runner-01
+      - RUNNER_LABELS=self-hosted,linux,t430,lite
+    volumes:
+      - /mnt/data/github-runners/t430-lite-runner/work:/home/runner/_work
+      - /var/run/docker.sock:/var/run/docker.sock
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G

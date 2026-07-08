@@ -1,0 +1,1 @@
+docker run -d --name RPDevs-Vault_rclone ghcr.io/rpdevs-vault/rpdevs-vault_rclone:latest

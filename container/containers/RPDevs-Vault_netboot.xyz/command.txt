@@ -1,0 +1,1 @@
+docker run -d --name RPDevs-Vault_netboot.xyz ghcr.io/rpdevs-vault/rpdevs-vault_netboot.xyz:latest

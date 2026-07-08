@@ -1,0 +1,1 @@
+docker run -d --name RPDevs-Vault_puppeteer-real-browser ghcr.io/rpdevs-vault/rpdevs-vault_puppeteer-real-browser:latest

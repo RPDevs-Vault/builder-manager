@@ -1,0 +1,1 @@
+docker run -d --name base-ubuntu ghcr.io/rpdevs-vault/base-ubuntu:latest

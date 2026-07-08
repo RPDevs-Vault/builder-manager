@@ -1,0 +1,43 @@
+name: Fleet Status Aggregator
+
+on:
+  schedule:
+    - cron: '0,30 * * * *' # Run every 30 minutes
+  workflow_dispatch:
+
+jobs:
+  aggregate-status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Fetch Workflow Status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p status
+          
+          # Fetch recent runs for primary workflows
+          gh run list --workflow=build-engine.yml --limit 1 --json status,conclusion,createdAt,url > status/build-engine.json
+          gh run list --workflow=ghcr-auditor.yml --limit 1 --json status,conclusion,createdAt,url > status/ghcr-auditor.json
+          gh run list --workflow=docker-collector.yml --limit 1 --json status,conclusion,createdAt,url > status/docker-collector.json
+          
+          # Combine into fleet-status.json
+          jq -n '{
+            "last_updated": (now | todate),
+            "workflows": {
+              "build_engine": [inputs][0][0],
+              "ghcr_auditor": [inputs][1][0],
+              "docker_collector": [inputs][2][0]
+            }
+          }' status/build-engine.json status/ghcr-auditor.json status/docker-collector.json > fleet-status.json
+          
+          cat fleet-status.json
+
+      - name: Upload Status Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: fleet-status
+          path: fleet-status.json
+          retention-days: 1

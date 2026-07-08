@@ -1,0 +1,97 @@
+name: Dependency Build Engine
+
+on:
+  push:
+    paths:
+      - 'dependencies/**'
+  workflow_dispatch:
+    inputs:
+      kodi_branch:
+        description: 'Kodi branch to build'
+        required: false
+        default: 'master'
+        type: choice
+        options:
+          - master
+          - Piers
+          - Omega
+
+jobs:
+  build-kodi-depends:
+    name: Build Kodi Dependencies (${{ matrix.platform }} - ${{ matrix.host_triplet }})
+    runs-on: [self-hosted, linux, local]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux
+            host_triplet: x86_64-linux-gnu
+            arch_name: linux-x86_64
+          - platform: linux
+            host_triplet: aarch64-linux-gnu
+            arch_name: linux-arm64
+          - platform: android
+            host_triplet: aarch64-linux-android
+            arch_name: android-arm64
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup Build Environment
+        run: |
+          sudo apt-get update || true
+          sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre || true
+
+      - name: Build Dependencies
+        id: build_step
+        env:
+          CCACHE_DIR: /mnt/ccache
+        run: |
+          chmod +x dependencies/kodi/build.sh
+          cd dependencies/kodi
+          BRANCH="${{ github.event.inputs.kodi_branch || 'master' }}"
+          echo "Starting build for ${{ matrix.arch_name }} (branch: $BRANCH). Logging to build.log..."
+          ./build.sh ${{ matrix.platform }} ${{ matrix.host_triplet }} "$BRANCH" > build.log 2>&1 || {
+            echo "::error::Build failed. Last 100 lines:"
+            tail -n 100 build.log
+            exit 1
+          }
+          echo "Build succeeded. Last 50 lines:"
+          tail -n 50 build.log
+
+      - name: Upload Build Log on Failure
+        if: failure() && steps.build_step.outcome == 'failure'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: build-log-${{ matrix.arch_name }}
+          path: dependencies/kodi/build.log
+
+      - name: Package Toolchain
+        run: |
+          cd dependencies/kodi/compiled-artifacts
+          tar -czvf ../../../kodi-dependencies-${{ matrix.arch_name }}.tar.gz .
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: kodi-dependencies-${{ matrix.arch_name }}
+          path: kodi-dependencies-${{ matrix.arch_name }}.tar.gz
+          retention-days: 14
+
+  dispatch-to-distributor:
+    name: Dispatch to Distributor
+    needs: build-kodi-depends
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Emit Repository Dispatch
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+        run: |
+          echo "Dispatching to distributor-manager..."
+          gh api -X POST /repos/RPDevs-Vault/distributor-manager/dispatches \
+            -f event_type='publish_artifact' \
+            -f client_payload[run_id]="${{ github.run_id }}" \
+            -f client_payload[project]="kodi-dependencies"
+          echo "Dispatch emitted successfully."

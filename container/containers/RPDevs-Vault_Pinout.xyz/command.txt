@@ -1,0 +1,1 @@
+docker run -d --name RPDevs-Vault_Pinout.xyz ghcr.io/rpdevs-vault/rpdevs-vault_pinout.xyz:latest
