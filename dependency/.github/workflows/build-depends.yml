@@ -1,0 +1,167 @@
+name: Build and Archive Kodi Depends
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Weekly on Sunday at midnight
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Kodi Branch (master, Omega, etc.)'
+        required: true
+        default: 'master'
+      platform:
+        description: 'Platform (android-arm64, osx64, linux64, win64, linux-arm64, ios, tvos)'
+        required: true
+        default: 'all'
+
+permissions:
+  contents: write
+
+jobs:
+  matrix-prep:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          if [ "${{ github.event.inputs.platform }}" == "all" ] || [ -z "${{ github.event.inputs.platform }}" ]; then
+            echo 'matrix=["android-arm64", "osx64", "linux64", "win64", "linux-arm64", "ios", "tvos"]' >> $GITHUB_OUTPUT
+          else
+            echo 'matrix=["${{ github.event.inputs.platform }}"]' >> $GITHUB_OUTPUT
+          fi
+
+  check-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      runner_status: ${{ steps.check.outputs.status }}
+    steps:
+      - name: Check if self-hosted runner is online
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GH_PAT }}
+        run: |
+          echo "Checking runner status..."
+          RUNNERS_JSON=$(curl -s -H "Authorization: token ${GH_TOKEN}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runners")
+          ONLINE=$(echo "$RUNNERS_JSON" | jq '.runners[] | select(.status == "online") | .name' 2>/dev/null)
+          
+          if [ -z "$ONLINE" ]; then
+            ORG="${{ github.repository_owner }}"
+            echo "Checking org $ORG runners..."
+            RUNNERS_JSON=$(curl -s -H "Authorization: token ${GH_TOKEN}" \
+              "https://api.github.com/orgs/${ORG}/actions/runners")
+            ONLINE=$(echo "$RUNNERS_JSON" | jq '.runners[] | select(.status == "online") | .name' 2>/dev/null)
+          fi
+          
+          if [ -n "$ONLINE" ]; then
+            echo "Found online self-hosted runner(s):"
+            echo "$ONLINE"
+            echo "status=online" >> $GITHUB_OUTPUT
+          else
+            echo "No online self-hosted runners found. Will fallback to GitHub-hosted."
+            echo "status=offline" >> $GITHUB_OUTPUT
+          fi
+
+  build-depends:
+    needs: [matrix-prep, check-runner]
+    name: Build Depends (${{ matrix.platform }})
+    runs-on: ${{ (matrix.platform == 'osx64' || matrix.platform == 'ios' || matrix.platform == 'tvos') && 'macos-latest' || (matrix.platform == 'win64' && 'windows-2022') || (needs.check-runner.outputs.runner_status == 'online' && fromJSON('["self-hosted", "linux64"]') || 'ubuntu-22.04') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: ${{ fromJSON(needs.matrix-prep.outputs.matrix) }}
+    steps:
+      - name: Checkout Kodi
+        uses: actions/checkout@v4
+        with:
+          repository: xbmc/xbmc
+          ref: ${{ github.event.inputs.branch || 'master' }}
+          path: source/xbmc
+
+      - name: Install macOS Dependencies
+        if: ${{ matrix.platform == 'osx64' || matrix.platform == 'ios' || matrix.platform == 'tvos' }}
+        run: brew install cmake ninja nasm gettext coreutils groff
+
+      - name: Build Depends (Unix)
+        if: ${{ matrix.platform != 'win64' }}
+        run: |
+          mkdir -p xbmc-deps
+          cd source/xbmc/tools/depends
+          
+          # macOS/Darwin Patches
+          if [[ "${{ matrix.platform }}" == "osx64" || "${{ matrix.platform }}" == "ios" || "${{ matrix.platform }}" == "tvos" ]]; then
+             echo "Applying Darwin kernel version and ASM patches..."
+             # Fix libgpg-error (Darwin 24 Sequoia support)
+             sed -i '' 's/$(MAKE) -C $(PLATFORM)/mkdir -p $(PLATFORM)\/src\/syscfg \&\& cp -v $(PLATFORM)\/src\/syscfg\/lock-obj-pub.aarch64-apple-darwin.h $(PLATFORM)\/src\/syscfg\/lock-obj-pub.darwin24.6.0.h || true \&\& $(MAKE) -C $(PLATFORM)/' target/libgpg-error/Makefile || true
+             # Fix libgcrypt (Disable ASM for ARM64 stability)
+             sed -i '' 's/$(CONFIGURE)/$(CONFIGURE) --disable-asm/' target/libgcrypt/Makefile || true
+          fi
+
+          # Global linux-arm64/android-arm64 fixes
+          if [[ "${{ matrix.platform }}" == "linux-arm64" || "${{ matrix.platform }}" == "android-arm64" ]]; then
+             echo "Applying cross-compilation fixes for libusb..."
+             # Fix libusb Makefile to use --host
+             sed -i 's/.\/configure/.\/configure --host=$(HOST)/' target/libusb/Makefile || true
+             # Build ONLY the library, skipping tests that fail to link
+             sed -i 's/$(MAKE) -C $(PLATFORM)$/$(MAKE) -C $(PLATFORM) libusb.la/' target/libusb/Makefile || true
+          fi
+
+          # Fix python3 linking with libintl on macOS/Apple
+          if [[ "${{ matrix.platform }}" == "osx64" || "${{ matrix.platform }}" == "ios" || "${{ matrix.platform }}" == "tvos" ]]; then
+             echo "Applying libintl linking fix for python3..."
+             # Use a more robust regex to replace the LIBS export and force -lintl
+             sed -i '' 's/export LIBS=.*/export LIBS=$(LINK_ICONV) -lintl/' target/python3/Makefile || true
+          fi
+
+          ./bootstrap
+
+          case "${{ matrix.platform }}" in
+            android-arm64) export CONFIG_FLAGS="--host=aarch64-linux-android --with-sdk-path=/opt/android-sdk --with-ndk-path=/opt/android-sdk/ndk/25.2.9519653" ;;
+            osx64) 
+              export CONFIG_FLAGS="--with-platform=macos"
+              # Surgical Makefile Patches
+              sed -i '' 's/$(CONFIGURE)/$(CONFIGURE) --disable-asm/' target/libgcrypt/Makefile
+              sed -i '' 's/$(MAKE) -C $(PLATFORM)/mkdir -p $(PLATFORM)\/src\/syscfg \&\& cp -v $(PLATFORM)\/src\/syscfg\/lock-obj-pub.aarch64-apple-darwin.h $(PLATFORM)\/src\/syscfg\/lock-obj-pub.darwin24.6.0.h || true \&\& $(MAKE) -C $(PLATFORM)/' target/libgpg-error/Makefile
+              ;;
+            ios)
+              export CONFIG_FLAGS="--with-platform=ios --host=aarch64-apple-darwin"
+              sed -i '' 's/$(CONFIGURE)/$(CONFIGURE) --disable-asm/' target/libgcrypt/Makefile
+              sed -i '' 's/$(MAKE) -C $(PLATFORM)/mkdir -p $(PLATFORM)\/src\/syscfg \&\& cp -v $(PLATFORM)\/src\/syscfg\/lock-obj-pub.aarch64-apple-darwin.h $(PLATFORM)\/src\/syscfg\/lock-obj-pub.darwin24.6.0.h || true \&\& $(MAKE) -C $(PLATFORM)/' target/libgpg-error/Makefile
+              ;;
+            tvos)
+              export CONFIG_FLAGS="--with-platform=tvos --host=aarch64-apple-darwin"
+              sed -i '' 's/$(CONFIGURE)/$(CONFIGURE) --disable-asm/' target/libgcrypt/Makefile
+              sed -i '' 's/$(MAKE) -C $(PLATFORM)/mkdir -p $(PLATFORM)\/src\/syscfg \&\& cp -v $(PLATFORM)\/src\/syscfg\/lock-obj-pub.aarch64-apple-darwin.h $(PLATFORM)\/src\/syscfg\/lock-obj-pub.darwin24.6.0.h || true \&\& $(MAKE) -C $(PLATFORM)/' target/libgpg-error/Makefile
+              ;;
+            linux64) export CONFIG_FLAGS="--host=x86_64-linux-gnu --with-rendersystem=gl" ;;
+            linux-arm64) export CONFIG_FLAGS="--host=aarch64-linux-gnu --with-rendersystem=gles" ;;
+          esac
+          ./configure --prefix=${{ github.workspace }}/xbmc-deps $CONFIG_FLAGS
+          make -j$(nproc || sysctl -n hw.ncpu)
+
+      - name: Build Depends (Windows)
+        if: ${{ matrix.platform == 'win64' }}
+        shell: cmd
+        run: |
+          cd source\xbmc\tools\buildsteps\windows\x64
+          call download-dependencies.bat
+          mkdir %GITHUB_WORKSPACE%\xbmc-deps
+          xcopy /E /I /Y %GITHUB_WORKSPACE%\source\xbmc\project\BuildDependencies %GITHUB_WORKSPACE%\xbmc-deps
+
+      - name: Archive and Stage Depends
+        shell: bash
+        run: |
+          tar -czf depends.tar.gz -C xbmc-deps .
+          # If running on our self-hosted infrastructure, also stage it to the shared appdata
+          if [ -d "/home/runner/shared/appdata" ]; then
+             mkdir -p /home/runner/shared/appdata/kodi-depends/${{ matrix.platform }}
+             cp depends.tar.gz /home/runner/shared/appdata/kodi-depends/${{ matrix.platform }}/depends.tar.gz
+             echo "✅ Staged to /home/runner/shared/appdata/kodi-depends/${{ matrix.platform }}/depends.tar.gz"
+          fi
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: depends-${{ matrix.platform }}-${{ github.event.inputs.branch || 'master' }}
+          path: depends.tar.gz
