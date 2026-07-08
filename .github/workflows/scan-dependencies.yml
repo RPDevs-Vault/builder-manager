@@ -11,7 +11,7 @@ permissions:
 jobs:
   scan-and-registry:
     name: Scan & Update Registry
-    runs-on: [self-hosted, linux, lightweight]
+    runs-on: [self-hosted, linux64, lightweight]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
