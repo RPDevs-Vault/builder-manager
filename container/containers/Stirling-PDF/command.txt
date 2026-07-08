@@ -1,0 +1,1 @@
+docker run -d --name Stirling-PDF ghcr.io/rpdevs-vault/stirling-pdf:latest
