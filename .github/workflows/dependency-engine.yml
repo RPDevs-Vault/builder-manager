@@ -27,15 +27,15 @@ jobs:
         - platform: linux
           host_triplet: x86_64-linux-gnu
           arch_name: linux-x86_64
-          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux", "llmadmin01"]}'
+          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux", "heavy"]}'
         - platform: linux
           host_triplet: aarch64-linux-gnu
           arch_name: linux-arm64
-          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux", "llmadmin01"]}'
+          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux", "heavy"]}'
         - platform: android
           host_triplet: aarch64-linux-android
           arch_name: android-arm64
-          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux", "llmadmin01"]}'
+          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux", "heavy"]}'
         - platform: osx64
           host_triplet: x86_64-apple-darwin
           arch_name: osx64
@@ -70,8 +70,8 @@ jobs:
     - name: Set Universal Cache Path
       id: cache-path
       run: |
-        # FIX: Validate against the stringified matrix variable, not runner context
-        if [[ "${{ contains(matrix.runner, 'self-hosted') }}" == "true" ]]; then
+        # Strictly POSIX compliant evaluation
+        if [ "${{ contains(matrix.runner, 'self-hosted') }}" = "true" ]; then
           echo "CACHE_BASE=/mnt/sharedroot/github_runners/shared" >> $GITHUB_ENV
         else
           echo "CACHE_BASE=/mnt/shared" >> $GITHUB_ENV
@@ -84,11 +84,16 @@ jobs:
         export CCACHE_DIR=$CACHE_BASE/ccache
         mkdir -p $CCACHE_DIR
         
+        # 🚀 MULTITHREADING ACTIVATED: Dynamically detect Linux or macOS cores
+        CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+        export MAKEFLAGS="-j$CORES"
+        export NINJAJOBS="$CORES"
+        
         chmod +x dependencies/kodi/build.sh
         cd dependencies/kodi
         BRANCH="${{ github.event.inputs.kodi_branch || 'master' }}"
         
-        echo "Building with ccache pointed to $CCACHE_DIR"
+        echo "Building on $CORES CPU threads with ccache pointed to $CCACHE_DIR"
         ./build.sh ${{ matrix.platform }} ${{ matrix.host_triplet }} "$BRANCH" > build.log 2>&1 || {
           echo "::error::Build failed. Last 100 lines:"
           tail -n 100 build.log

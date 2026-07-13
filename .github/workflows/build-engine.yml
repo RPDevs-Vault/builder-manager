@@ -131,10 +131,8 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
       with:
-        # Safely capped at 35GB to allow CUDA extraction without starving the host drive
+        # 🚀 MULTITHREADING ACTIVATED: Removed the core-count restriction
         buildkitd-config-inline: |
-          [worker.oci]
-            max-parallelism = 4
           [[worker.oci.gcpolicy]]
             keepBytes = "35GB"
             keepDuration = "336h"
