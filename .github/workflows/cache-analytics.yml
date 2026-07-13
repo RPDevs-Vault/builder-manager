@@ -1,0 +1,110 @@
+name: Cache Analytics Dashboard
+
+on:
+  schedule:
+  - cron: '0 5 * * *'   # Runs daily at 5:00 AM
+  workflow_dispatch:
+
+env:
+  CACHE_BASE: /mnt/sharedroot/github_runners/shared
+
+jobs:
+  generate-dashboard:
+    name: Generate Cache Metrics
+    runs-on:
+      group: linux-builders
+      labels: [self-hosted, linux, t430]
+    permissions:
+      issues: write
+      contents: read
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Gather Metrics and Generate Report
+      run: |
+        echo "Gathering disk and cache metrics..."
+        REPORT="dashboard.md"
+        
+        # 1. Header and Timestamp
+        echo "# 📊 Persistent Cache Analytics Dashboard" > $REPORT
+        echo "_Last Updated: $(date -u) (UTC)_" >> $REPORT
+        echo "---" >> $REPORT
+
+        # 2. Ccache Metrics (C++ Compilation)
+        echo "### ⚙️ Ccache (C++ Heavy Compilation)" >> $REPORT
+        export CCACHE_DIR=$CACHE_BASE/ccache
+        if command -v ccache >/dev/null; then
+          echo "\`\`\`text" >> $REPORT
+          ccache -s >> $REPORT
+          echo "\`\`\`" >> $REPORT
+        else
+          echo "> ⚠️ ccache is not installed on this runner." >> $REPORT
+        fi
+
+        # 3. Docker Cache Storage
+        echo "### 🐳 Docker Buildx Cache" >> $REPORT
+        echo "| Directory | Size |" >> $REPORT
+        echo "| :--- | :--- |" >> $REPORT
+        if [ -d "$CACHE_BASE/docker-cache" ]; then
+          # Get size of the top-level project folders in the docker cache
+          for dir in $CACHE_BASE/docker-cache/*; do
+            if [ -d "$dir" ]; then
+              SIZE=$(du -sh "$dir" | cut -f1)
+              BASENAME=$(basename "$dir")
+              echo "| \`$BASENAME\` | **$SIZE** |" >> $REPORT
+            fi
+          done
+        else
+          echo "| _Empty_ | _0B_ |" >> $REPORT
+        fi
+        echo "" >> $REPORT
+
+        # 4. Dependency Caches (Global Registries)
+        echo "### 📦 Dependency Caches" >> $REPORT
+        echo "| Ecosystem | Cache Directory | Size |" >> $REPORT
+        echo "| :--- | :--- | :--- |" >> $REPORT
+        
+        get_size() {
+          if [ -d "$1" ]; then
+            du -sh "$1" | cut -f1
+          else
+            echo "0B"
+          fi
+        }
+
+        echo "| Node/NPM | \`npm-cache\` | **$(get_size $CACHE_BASE/npm-cache)** |" >> $REPORT
+        echo "| Python (Pip) | \`pip-cache\` | **$(get_size $CACHE_BASE/pip-cache)** |" >> $REPORT
+        echo "| Python (Poetry)| \`poetry-cache\` | **$(get_size $CACHE_BASE/poetry-cache)** |" >> $REPORT
+        echo "| Go Modules | \`go-cache\` | **$(get_size $CACHE_BASE/go-cache)** |" >> $REPORT
+        echo "| Rust (Cargo) | \`cargo-home\` | **$(get_size $CACHE_BASE/cargo-home)** |" >> $REPORT
+        echo "" >> $REPORT
+
+        # 5. Overall Disk Health
+        echo "### 💾 NFS Host Disk Space" >> $REPORT
+        echo "\`\`\`bash" >> $REPORT
+        df -h $CACHE_BASE >> $REPORT
+        echo "\`\`\`" >> $REPORT
+
+    - name: Update GitHub Dashboard Issue
+      env:
+        GH_TOKEN: ${{ secrets.SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+      run: |
+        echo "Publishing to GitHub Issues..."
+        
+        # Check if the dashboard issue already exists
+        ISSUE_NUM=$(gh issue list --repo ${{ github.repository }} --label "cache-dashboard" --state open --json number -q '.[0].number')
+        
+        if [ -z "$ISSUE_NUM" ] || [ "$ISSUE_NUM" == "null" ]; then
+          echo "Dashboard issue not found. Creating a new one..."
+          gh issue create \
+            --repo ${{ github.repository }} \
+            --title "📊 Cache Analytics Dashboard" \
+            --body-file dashboard.md \
+            --label "cache-dashboard"
+        else
+          echo "Found existing Dashboard (Issue #$ISSUE_NUM). Updating..."
+          gh issue edit $ISSUE_NUM \
+            --repo ${{ github.repository }} \
+            --body-file dashboard.md
+        fi
