@@ -207,7 +207,19 @@ RUN dnf install -y cuda-toolkit-${CUDA13VERSION//./-} \
     && dnf install -y libcudnn9-cuda-13 libcudnn9-devel-cuda-13 \
     && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf install -y libnccl libnccl-devel \\
     && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf clean all \\
-    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel rm -rf /var/cache/dnf
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel rm -rf /var/cache/dnf&& dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf install -y libnccl libnccl-devel \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf clean all \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel rm -rf /var/cache/dnf dnf install -y libnccl libnccl-devel \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf install -y libnccl libnccl-devel \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf clean all \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel rm -rf /var/cache/dnf&& dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf install -y libnccl libnccl-devel \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf clean all \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel rm -rf /var/cache/dnf dnf clean all \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf install -y libnccl libnccl-devel \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf clean all \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel rm -rf /var/cache/dnf&& dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf install -y libnccl libnccl-devel \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel dnf clean all \\
+    && dnf install -y libnccl libnccl-devel&& dnf install -y libnccl libnccl-devel rm -rf /var/cache/dnf rm -rf /var/cache/dnf
 ENV PATH=/usr/local/cuda-13/bin:$PATH
 ENV BLAS_INCLUDE_DIRS=/usr/include/openblas
 ENV LAPACK_INCLUDE_DIRS=/usr/include/openblas
