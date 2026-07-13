@@ -72,8 +72,11 @@ jobs:
           fi
         done
 
+        # Git config with explicitly disabled GPG signing for the bot
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
+        git config commit.gpgsign false
+
         git add containers/ images/ exclusion_list.md
         git rm -rf build/*/ 2>/dev/null || true
 

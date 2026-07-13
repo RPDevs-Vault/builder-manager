@@ -100,7 +100,6 @@ jobs:
         fi
 
     - name: Mount Remote NFS Cache via Cloudflare Tunnel
-      # FIX: Evaluate the runner output directly
       if: "!contains(needs.setup-matrix.outputs.runner, 'self-hosted')"
       env:
         CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
@@ -120,7 +119,6 @@ jobs:
     - name: Set Universal Cache Path
       id: cache-path
       run: |
-        # FIX: Evaluate the runner output directly
         if [[ "${{ contains(needs.setup-matrix.outputs.runner, 'self-hosted') }}" == "true" ]]; then
           echo "CACHE_BASE=/mnt/sharedroot/github_runners/shared" >> $GITHUB_ENV
         else
@@ -165,8 +163,11 @@ jobs:
           echo "# 📦 $NAME" > "images/$NAME.md"
           echo "Image: \`$IMAGE_NAME:latest\`" >> "images/$NAME.md"
 
+          # Git config with explicitly disabled GPG signing for the bot
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config commit.gpgsign false
+
           git add .
           if ! git diff --staged --quiet; then
             git commit -m "chore(archiver): update $NAME source and assets"
@@ -195,14 +196,12 @@ jobs:
         fi
 
     - name: Cleanup NFS and Cloudflare Tunnel
-      # FIX: Evaluate the runner output directly
       if: always() && !contains(needs.setup-matrix.outputs.runner, 'self-hosted')
       run: |
         sudo umount -f /mnt/shared || true
         sudo pkill -f cloudflared || true
 
     - name: Runner Housekeeping
-      # FIX: Evaluate the runner output directly
       if: always() && contains(needs.setup-matrix.outputs.runner, 'self-hosted')
       run: |
         docker image prune -f --filter "label=com.github.actions.runner" || true
