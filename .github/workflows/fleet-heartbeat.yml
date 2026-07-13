@@ -1,0 +1,75 @@
+name: Fleet Heartbeat Monitor
+
+on:
+  schedule:
+    - cron: '*/15 * * * *' # Runs every 15 minutes
+  workflow_dispatch:
+
+jobs:
+  monitor-runners:
+    name: Check Fleet Pulse
+    runs-on: ubuntu-latest
+    steps:
+    - name: Fetch Fleet Status
+      id: pulse-check
+      env:
+        GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+      run: |
+        echo "📡 Querying GitHub API for runner statuses..."
+        RUNNERS_JSON=$(gh api /orgs/RPDevs-Vault/actions/runners)
+
+        # Extract statuses based on the specific hardware labels we set earlier
+        T430_STATUS=$(echo "$RUNNERS_JSON" | jq -r '.runners[] | select(.labels[].name == "t430") | .status' | head -n 1)
+        LLM_STATUS=$(echo "$RUNNERS_JSON" | jq -r '.runners[] | select(.labels[].name == "llmadmin01") | .status' | head -n 1)
+
+        echo "T430 (Cache Hub): ${T430_STATUS:-Not Found}"
+        echo "LLMAdmin01 (Heavy Lifter): ${LLM_STATUS:-Not Found}"
+
+        # Flag individual runners if they are offline
+        if [[ "$T430_STATUS" != "online" ]]; then
+          echo "t430_down=true" >> $GITHUB_OUTPUT
+        fi
+
+        if [[ "$LLM_STATUS" != "online" ]]; then
+          echo "llm_down=true" >> $GITHUB_OUTPUT
+        fi
+
+        # If any core infrastructure is down, fail the step to trigger alerts
+        if [[ "$T430_STATUS" != "online" ]] || [[ "$LLM_STATUS" != "online" ]]; then
+          echo "::error::One or more mission-critical runners are offline!"
+          exit 1
+        fi
+
+    - name: Ping Uptime Kuma (UP)
+      if: success()
+      run: |
+        if [ -n "${{ secrets.UPTIME_KUMA_PUSH_URL }}" ]; then
+          curl -s "${{ secrets.UPTIME_KUMA_PUSH_URL }}?status=up&msg=Fleet+Online"
+        else
+          echo "⚠️ UPTIME_KUMA_PUSH_URL secret is missing. Skipping Kuma ping."
+        fi
+
+    - name: Ping Uptime Kuma (DOWN)
+      if: failure()
+      run: |
+        if [ -n "${{ secrets.UPTIME_KUMA_PUSH_URL }}" ]; then
+          curl -s "${{ secrets.UPTIME_KUMA_PUSH_URL }}?status=down&msg=Runners+Offline"
+        fi
+
+    - name: Alert ntfy.sh (T430 Offline)
+      if: failure() && steps.pulse-check.outputs.t430_down == 'true'
+      run: |
+        curl -H "Title: 🚨 T430 Cache Hub Offline" \
+             -H "Tags: warning,computer" \
+             -H "Priority: high" \
+             -d "The GitHub runner on the T430 has dropped offline. Docker cache mapping will fail." \
+             https://ntfy.sh/github_iamrpdev
+
+    - name: Alert ntfy.sh (LLMAdmin01 Offline)
+      if: failure() && steps.pulse-check.outputs.llm_down == 'true'
+      run: |
+        curl -H "Title: 🚨 LLMAdmin01 Runner Offline" \
+             -H "Tags: warning,server" \
+             -H "Priority: high" \
+             -d "The heavy-lifter runner on LLMAdmin01 has dropped offline. C++ Kodi builds will be queued indefinitely." \
+             https://ntfy.sh/github_iamrpdev
