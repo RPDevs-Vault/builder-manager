@@ -16,7 +16,7 @@ jobs:
   collect:
     runs-on:
       group: linux-builders
-      labels: [self-hosted, linux, lightweight]
+      labels: [self-hosted, linux]
     permissions:
       contents: write
       issues: write
