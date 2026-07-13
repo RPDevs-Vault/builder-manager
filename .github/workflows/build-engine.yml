@@ -33,7 +33,6 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
       run: |
-        # Assess fallback or escalation to llmadmin01
         RUNS=$(gh api /repos/${{ github.repository }}/actions/workflows/build-engine.yml/runs?status=success\&per_page=3)
         TOTAL_DURATION=0
         COUNT=0
@@ -114,8 +113,18 @@ jobs:
         export TUNNEL_SERVICE_TOKEN_SECRET=$CF_CLIENT_SECRET
         cloudflared access tcp --hostname nfs-sharedroot.iamrp.dev --url 127.0.0.1:2049 &
         sleep 5
-        sudo mkdir -p /home/runner/shared
-        sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot /home/runner/shared
+        sudo mkdir -p /mnt/shared
+        # Updated mount path to match the test workflow
+        sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot/github_runners/shared /mnt/shared
+
+    - name: Set Universal Cache Path
+      id: cache-path
+      run: |
+        if [[ "${{ contains(runner.labels, 'self-hosted') }}" == "true" ]]; then
+          echo "CACHE_BASE=/mnt/sharedroot/github_runners/shared" >> $GITHUB_ENV
+        else
+          echo "CACHE_BASE=/mnt/shared" >> $GITHUB_ENV
+        fi
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
@@ -131,14 +140,13 @@ jobs:
     - name: Prepare Source
       run: |
         if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
-        NAME="${{ matrix.project.name }}"
         DIR="${{ matrix.project.dir }}"
         URL="${{ matrix.project.source_url || matrix.project.url }}"
         BRANCH="${{ matrix.project.branch || 'main' }}"
         if [[ "${{ matrix.project.source }}" == "manifest" || "${{ matrix.project.source }}" == "thirdparty" ]]; then
           mkdir -p build
           rm -rf "$DIR"
-          git clone --depth 1 --branch "$BRANCH" "$URL" "$DIR" || git clone --depth 1 --branch "master" "$URL" "$DIR" || echo "Failed to clone $NAME"
+          git clone --depth 1 --branch "$BRANCH" "$URL" "$DIR" || git clone --depth 1 --branch "master" "$URL" "$DIR"
         fi
 
     - name: Archive and Organize
@@ -152,16 +160,9 @@ jobs:
           IMAGE_NAME="ghcr.io/rpdevs-vault/${NAME,,}"
           echo "docker run -d --name $NAME $IMAGE_NAME:latest" > "containers/$NAME/command.txt"
           
-          echo "# 📦 $NAME" > "containers/$NAME/README.md"
-          echo "- **Image:** \`$IMAGE_NAME:latest\`" >> "containers/$NAME/README.md"
-          echo "- **Type:** ${{ matrix.project.source }}" >> "containers/$NAME/README.md"
-          echo "- **Registry:** [GHCR](https://github.com/orgs/RPDevs-Vault/packages/container/${NAME,,})" >> "containers/$NAME/README.md"
-          echo "- **Last Built:** \$(date)" >> "containers/$NAME/README.md"
-
           mkdir -p images
           echo "# 📦 $NAME" > "images/$NAME.md"
           echo "Image: \`$IMAGE_NAME:latest\`" >> "images/$NAME.md"
-          echo "Registry: [GHCR](https://github.com/orgs/RPDevs-Vault/packages/container/${NAME,,})" >> "images/$NAME.md"
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -183,16 +184,21 @@ jobs:
         if [ -f "$DIR/Dockerfile" ] || [ -f "$DIR/dockerfile" ]; then
           DOCKERFILE=$(ls "$DIR" | grep -i "^dockerfile$" | head -n 1)
           PLATFORMS="${{ matrix.project.platforms && join(matrix.project.platforms, ',') || 'linux/amd64,linux/arm64' }}"
+          
+          # Initialize directory to prevent Docker permission errors
+          mkdir -p ${CACHE_BASE}/docker-cache/${{ matrix.project.name }}
+          
+          # Buildx pointing dynamically to the resolved CACHE_BASE
           docker buildx build --platform "$PLATFORMS" \
-            --cache-from type=local,src=/home/runner/shared/docker-cache/${{ matrix.project.name }} \
-            --cache-to type=local,dest=/home/runner/shared/docker-cache/${{ matrix.project.name }},mode=max \
+            --cache-from type=local,src=${CACHE_BASE}/docker-cache/${{ matrix.project.name }} \
+            --cache-to type=local,dest=${CACHE_BASE}/docker-cache/${{ matrix.project.name }},mode=max \
             -f "$DIR/$DOCKERFILE" -t "$IMAGE_NAME:latest" --push "$DIR"
         fi
 
     - name: Cleanup NFS and Cloudflare Tunnel
       if: always() && !contains(runner.labels, 'self-hosted')
       run: |
-        sudo umount -f /home/runner/shared || true
+        sudo umount -f /mnt/shared || true
         sudo pkill -f cloudflared || true
 
     - name: Runner Housekeeping

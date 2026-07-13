@@ -61,21 +61,35 @@ jobs:
       if: matrix.platform == 'linux' || matrix.platform == 'android'
       run: |
         sudo apt-get update || true
-        sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre || true
+        sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre ccache || true
 
     - name: Setup Build Environment (macOS/iOS/tvOS)
       if: matrix.platform == 'osx64' || matrix.platform == 'ios' || matrix.platform == 'tvos'
-      run: brew install cmake ninja nasm gettext coreutils groff
+      run: brew install cmake ninja nasm gettext coreutils groff ccache
+
+    - name: Set Universal Cache Path
+      id: cache-path
+      run: |
+        if [[ "${{ contains(runner.labels, 'self-hosted') }}" == "true" ]]; then
+          echo "CACHE_BASE=/mnt/sharedroot/github_runners/shared" >> $GITHUB_ENV
+        else
+          # Future-proofing in case Mac/Windows runners map here later
+          echo "CACHE_BASE=/mnt/shared" >> $GITHUB_ENV
+        fi
 
     - name: Build Dependencies (Unix)
       if: matrix.platform != 'win64'
       id: build_step
-      env:
-        CCACHE_DIR: /home/runner/.ccache
       run: |
+        # Wire CCACHE directly to the NFS mount
+        export CCACHE_DIR=$CACHE_BASE/ccache
+        mkdir -p $CCACHE_DIR
+        
         chmod +x dependencies/kodi/build.sh
         cd dependencies/kodi
         BRANCH="${{ github.event.inputs.kodi_branch || 'master' }}"
+        
+        echo "Building with ccache pointed to $CCACHE_DIR"
         ./build.sh ${{ matrix.platform }} ${{ matrix.host_triplet }} "$BRANCH" > build.log 2>&1 || {
           echo "::error::Build failed. Last 100 lines:"
           tail -n 100 build.log
@@ -115,16 +129,14 @@ jobs:
   dispatch-to-distributor:
     name: Dispatch to Distributor
     needs: build-kodi-depends
-    runs-on: ubuntu-latest  # <-- Changed from self-hosted group
+    runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
     - name: Emit Repository Dispatch
       env:
         GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
       run: |
-        echo "Dispatching to distributor-manager..."
         gh api -X POST /repos/RPDevs-Vault/delivery-manager/dispatches \
           -f event_type='publish_artifact' \
           -f client_payload[run_id]="${{ github.run_id }}" \
           -f client_payload[project]="kodi-dependencies"
-        echo "Dispatch emitted successfully."

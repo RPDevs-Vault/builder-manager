@@ -2,8 +2,12 @@ name: Warm Up Dependency Caches
 
 on:
   schedule:
-  - cron: '30 3 * * 0'   # Weekly on Sunday at 3:30 AM (staggered from housekeeping)
+  - cron: '30 3 * * 0'   # Weekly on Sunday at 3:30 AM
   workflow_dispatch:
+
+env:
+  # Native mount path on the T430
+  CACHE_BASE: /mnt/sharedroot/github_runners/shared
 
 jobs:
   warmup-npm:
@@ -13,8 +17,13 @@ jobs:
     steps:
     - name: Cache Check
       run: |
-        mkdir -p ~/.npm ~/.npm-global
+        echo "Warming up NPM cache..."
+        mkdir -p $CACHE_BASE/npm-cache ~/.npm-global
+        
+        # Force NPM to use the persistent NFS cache
+        npm config set cache $CACHE_BASE/npm-cache
         npm config set prefix ~/.npm-global
+        
         npm install -g npm@latest
         npm cache verify
 
@@ -25,11 +34,15 @@ jobs:
     steps:
     - name: Cache Check
       run: |
+        echo "Warming up Go module cache..."
+        mkdir -p $CACHE_BASE/go-cache
+        
         export GOPATH=$HOME/go
+        export GOMODCACHE=$CACHE_BASE/go-cache
         export GO111MODULE=on
+        
         go install github.com/spf13/cobra-cli@latest || true
         go install github.com/yuin/goldmark@latest || true
-        go clean -modcache -cache || true
 
   warmup-rust:
     runs-on:
@@ -38,7 +51,11 @@ jobs:
     steps:
     - name: Cache Check
       run: |
-        mkdir -p ~/.cargo
+        echo "Warming up Cargo/Rust cache..."
+        mkdir -p $CACHE_BASE/cargo-home
+        
+        # Redirect Cargo downloads/registry to NFS
+        export CARGO_HOME=$CACHE_BASE/cargo-home
         cargo install cargo-edit --no-default-features --features vendored-openssl || true
 
   warmup-python:
@@ -48,6 +65,13 @@ jobs:
     steps:
     - name: Cache Check
       run: |
-        mkdir -p ~/.cache/pip ~/.cache/pypoetry
+        echo "Warming up Python Pip and Poetry caches..."
+        mkdir -p $CACHE_BASE/pip-cache$CACHE_BASE/poetry-cache
+        
+        export PIP_CACHE_DIR=$CACHE_BASE/pip-cache
         pip install --user --upgrade pip setuptools wheel
         pip install --user requests urllib3 poetry pydantic pytest black
+        
+        if command -v poetry &> /dev/null; then
+          poetry config cache-dir $CACHE_BASE/poetry-cache
+        fi
