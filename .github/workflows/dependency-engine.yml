@@ -70,10 +70,10 @@ jobs:
     - name: Set Universal Cache Path
       id: cache-path
       run: |
-        if [[ "${{ contains(runner.labels, 'self-hosted') }}" == "true" ]]; then
+        # FIX: Validate against the stringified matrix variable, not runner context
+        if [[ "${{ contains(matrix.runner, 'self-hosted') }}" == "true" ]]; then
           echo "CACHE_BASE=/mnt/sharedroot/github_runners/shared" >> $GITHUB_ENV
         else
-          # Future-proofing in case Mac/Windows runners map here later
           echo "CACHE_BASE=/mnt/shared" >> $GITHUB_ENV
         fi
 
@@ -81,7 +81,6 @@ jobs:
       if: matrix.platform != 'win64'
       id: build_step
       run: |
-        # Wire CCACHE directly to the NFS mount
         export CCACHE_DIR=$CACHE_BASE/ccache
         mkdir -p $CCACHE_DIR
         

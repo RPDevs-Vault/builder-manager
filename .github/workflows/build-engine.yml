@@ -100,7 +100,8 @@ jobs:
         fi
 
     - name: Mount Remote NFS Cache via Cloudflare Tunnel
-      if: "!contains(runner.labels, 'self-hosted')"
+      # FIX: Evaluate the runner output directly
+      if: "!contains(needs.setup-matrix.outputs.runner, 'self-hosted')"
       env:
         CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
         CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
@@ -114,13 +115,13 @@ jobs:
         cloudflared access tcp --hostname nfs-sharedroot.iamrp.dev --url 127.0.0.1:2049 &
         sleep 5
         sudo mkdir -p /mnt/shared
-        # Updated mount path to match the test workflow
         sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot/github_runners/shared /mnt/shared
 
     - name: Set Universal Cache Path
       id: cache-path
       run: |
-        if [[ "${{ contains(runner.labels, 'self-hosted') }}" == "true" ]]; then
+        # FIX: Evaluate the runner output directly
+        if [[ "${{ contains(needs.setup-matrix.outputs.runner, 'self-hosted') }}" == "true" ]]; then
           echo "CACHE_BASE=/mnt/sharedroot/github_runners/shared" >> $GITHUB_ENV
         else
           echo "CACHE_BASE=/mnt/shared" >> $GITHUB_ENV
@@ -185,10 +186,8 @@ jobs:
           DOCKERFILE=$(ls "$DIR" | grep -i "^dockerfile$" | head -n 1)
           PLATFORMS="${{ matrix.project.platforms && join(matrix.project.platforms, ',') || 'linux/amd64,linux/arm64' }}"
           
-          # Initialize directory to prevent Docker permission errors
           mkdir -p ${CACHE_BASE}/docker-cache/${{ matrix.project.name }}
           
-          # Buildx pointing dynamically to the resolved CACHE_BASE
           docker buildx build --platform "$PLATFORMS" \
             --cache-from type=local,src=${CACHE_BASE}/docker-cache/${{ matrix.project.name }} \
             --cache-to type=local,dest=${CACHE_BASE}/docker-cache/${{ matrix.project.name }},mode=max \
@@ -196,12 +195,14 @@ jobs:
         fi
 
     - name: Cleanup NFS and Cloudflare Tunnel
-      if: always() && !contains(runner.labels, 'self-hosted')
+      # FIX: Evaluate the runner output directly
+      if: always() && !contains(needs.setup-matrix.outputs.runner, 'self-hosted')
       run: |
         sudo umount -f /mnt/shared || true
         sudo pkill -f cloudflared || true
 
     - name: Runner Housekeeping
-      if: always() && contains(runner.labels, 'self-hosted')
+      # FIX: Evaluate the runner output directly
+      if: always() && contains(needs.setup-matrix.outputs.runner, 'self-hosted')
       run: |
         docker image prune -f --filter "label=com.github.actions.runner" || true
