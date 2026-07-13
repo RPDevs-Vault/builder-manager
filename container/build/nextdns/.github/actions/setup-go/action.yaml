@@ -1,9 +1,0 @@
-name: "Set up Go"
-description: "Centralized action for setting up Go"
-runs:
-  using: "composite"
-  steps:
-    - name: Set up Go
-      uses: actions/setup-go@v6
-      with:
-        go-version: "1.26.x"
