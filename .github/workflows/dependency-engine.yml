@@ -14,15 +14,11 @@ on:
         required: false
         default: 'master'
         type: choice
-        options:
-        - master
-        - Piers
-        - Omega
+        options: [master, Piers, Omega]
 
 jobs:
   build-kodi-depends:
-    name: Build Kodi Dependencies (${{ matrix.platform }} - ${{ 
-      matrix.host_triplet }})
+    name: Build Kodi Dependencies (${{ matrix.platform }})
     runs-on: ${{ fromJSON(matrix.runner) }}
     strategy:
       fail-fast: false
@@ -31,18 +27,15 @@ jobs:
         - platform: linux
           host_triplet: x86_64-linux-gnu
           arch_name: linux-x86_64
-          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux",
-            "heavy"]}'
+          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux", "llmadmin01"]}'
         - platform: linux
           host_triplet: aarch64-linux-gnu
           arch_name: linux-arm64
-          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux",
-            "heavy"]}'
+          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux", "llmadmin01"]}'
         - platform: android
           host_triplet: aarch64-linux-android
           arch_name: android-arm64
-          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux",
-            "heavy"]}'
+          runner: '{"group": "linux-builders", "labels": ["self-hosted", "linux", "llmadmin01"]}'
         - platform: osx64
           host_triplet: x86_64-apple-darwin
           arch_name: osx64
@@ -62,7 +55,7 @@ jobs:
 
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5   # v4
+      uses: actions/checkout@v4
 
     - name: Setup Build Environment (Linux/Android)
       if: matrix.platform == 'linux' || matrix.platform == 'android'
@@ -71,8 +64,7 @@ jobs:
         sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre || true
 
     - name: Setup Build Environment (macOS/iOS/tvOS)
-      if: matrix.platform == 'osx64' || matrix.platform == 'ios' || 
-        matrix.platform == 'tvos'
+      if: matrix.platform == 'osx64' || matrix.platform == 'ios' || matrix.platform == 'tvos'
       run: brew install cmake ninja nasm gettext coreutils groff
 
     - name: Build Dependencies (Unix)
@@ -84,13 +76,11 @@ jobs:
         chmod +x dependencies/kodi/build.sh
         cd dependencies/kodi
         BRANCH="${{ github.event.inputs.kodi_branch || 'master' }}"
-        echo "Starting build for ${{ matrix.arch_name }} (branch: $BRANCH). Logging to build.log..."
         ./build.sh ${{ matrix.platform }} ${{ matrix.host_triplet }} "$BRANCH" > build.log 2>&1 || {
           echo "::error::Build failed. Last 100 lines:"
           tail -n 100 build.log
           exit 1
         }
-        echo "Build succeeded. Last 50 lines:"
         tail -n 50 build.log
 
     - name: Build Dependencies (Windows)
@@ -105,7 +95,7 @@ jobs:
 
     - name: Upload Build Log on Failure
       if: failure() && steps.build_step.outcome == 'failure'
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02   # v4
+      uses: actions/upload-artifact@v4
       with:
         name: build-log-${{ matrix.arch_name }}
         path: container/dependencies/kodi/build.log
@@ -114,9 +104,9 @@ jobs:
       run: |
         cd dependencies/kodi/compiled-artifacts
         tar -czvf ../../../kodi-dependencies-${{ matrix.arch_name }}.tar.gz .
-
+        
     - name: Upload Artifact
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02   # v4
+      uses: actions/upload-artifact@v4
       with:
         name: kodi-dependencies-${{ matrix.arch_name }}
         path: container/kodi-dependencies-${{ matrix.arch_name }}.tar.gz
@@ -125,12 +115,7 @@ jobs:
   dispatch-to-distributor:
     name: Dispatch to Distributor
     needs: build-kodi-depends
-    runs-on:
-      group: linux-builders
-      labels:
-      - self-hosted
-      - linux
-      - lightweight
+    runs-on: ubuntu-latest  # <-- Changed from self-hosted group
     if: github.ref == 'refs/heads/main'
     steps:
     - name: Emit Repository Dispatch

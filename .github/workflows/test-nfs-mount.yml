@@ -5,21 +5,15 @@ on:
 
 jobs:
   test-nfs-mount:
-    runs-on:
-
-      group: linux-builders
-      labels:
-      - self-hosted
-      - linux
-      - lightweight
+    runs-on: ubuntu-latest
     steps:
     - name: Mount Remote NFS Cache via Cloudflare Tunnel
       env:
         CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
         CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
       run: |
-        echo "Installing NFS Common and Cloudflared..."
-        sudo apt-get update && sudo apt-get install -y nfs-common
+        echo "Installing NFS Common, Tree, and Cloudflared..."
+        sudo apt-get update && sudo apt-get install -y nfs-common tree
         curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
         sudo dpkg -i cloudflared.deb
 
@@ -32,9 +26,46 @@ jobs:
         sleep 10
 
         echo "Mounting NFS Share..."
-        mkdir -p /mnt/shared
+        sudo mkdir -p /mnt/shared
         sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot/github_runners/shared /mnt/shared
 
-        echo "Verifying Mount Contents..."
-        ls -la /mnt/shared
-        df -h /mnt/shared
+    - name: Generate NFS Diagnostic Report
+      run: |
+        echo "### 📂 NFS Cache Diagnostic Report" >> $GITHUB_STEP_SUMMARY
+        
+        echo "#### 1. Mount Configuration" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+        mount | grep nfs >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+        echo "#### 2. Storage Capacity" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+        df -h /mnt/shared >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+        echo "#### 3. Ownership and Permissions (Numeric IDs)" >> $GITHUB_STEP_SUMMARY
+        echo "*Note: GitHub Actions 'runner' user is usually UID 1001. If the NFS share expects a different UID, writes may fail.*" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+        ls -lnd /mnt/shared
+        ls -ln /mnt/shared >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+        echo "#### 4. Directory Structure (Depth 3)" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+        tree -L 3 /mnt/shared >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+
+        echo "#### 5. Write Access Test" >> $GITHUB_STEP_SUMMARY
+        if sudo -u runner touch /mnt/shared/.github_write_test; then
+          echo "✅ **Success:** The \`runner\` user can successfully write to the NFS cache." >> $GITHUB_STEP_SUMMARY
+          sudo rm /mnt/shared/.github_write_test
+        else
+          echo "❌ **Failed:** The \`runner\` user was denied write access. Check UID/GID mapping on the NFS server or mount as root." >> $GITHUB_STEP_SUMMARY
+        fi
+
+    - name: Cleanup NFS and Tunnel
+      if: always()
+      run: |
+        echo "Gracefully closing tunnel and unmounting from cloud runner..."
+        sudo umount -f /mnt/shared || true
+        sudo pkill -f cloudflared || true

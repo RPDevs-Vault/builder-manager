@@ -2,66 +2,52 @@ name: Warm Up Dependency Caches
 
 on:
   schedule:
-  - cron: '0 3 * * 0'   # Weekly on Sunday at 3:00 AM (after the repo scan)
+  - cron: '30 3 * * 0'   # Weekly on Sunday at 3:30 AM (staggered from housekeeping)
   workflow_dispatch:
 
 jobs:
   warmup-npm:
-    name: Warm Up NPM Cache
     runs-on:
       group: linux-builders
-      labels: [self-hosted, linux, lightweight]
+      labels: [self-hosted, linux, t430]
     steps:
     - name: Cache Check
       run: |
-        echo "Warming up NPM cache..."
-        mkdir -p ~/.npm
-        # Set prefix to home folder to avoid global permission errors
-        mkdir -p ~/.npm-global
+        mkdir -p ~/.npm ~/.npm-global
         npm config set prefix ~/.npm-global
-        # Install common tools to populate the shared npm cache
         npm install -g npm@latest
         npm cache verify
 
   warmup-go:
-    name: Warm Up Go Cache
     runs-on:
       group: linux-builders
-      labels: [self-hosted, linux, lightweight]
+      labels: [self-hosted, linux, t430]
     steps:
     - name: Cache Check
       run: |
-        echo "Warming up Go module cache..."
         export GOPATH=$HOME/go
         export GO111MODULE=on
-        # Fetch commonly used modules
         go install github.com/spf13/cobra-cli@latest || true
         go install github.com/yuin/goldmark@latest || true
         go clean -modcache -cache || true
 
   warmup-rust:
-    name: Warm Up Cargo Cache
     runs-on:
       group: linux-builders
-      labels: [self-hosted, linux, lightweight]
+      labels: [self-hosted, linux, t430]
     steps:
     - name: Cache Check
       run: |
-        echo "Warming up Cargo/Rust cache..."
         mkdir -p ~/.cargo
-        # Update the cargo registry index
         cargo install cargo-edit --no-default-features --features vendored-openssl || true
 
   warmup-python:
-    name: Warm Up Python Cache
     runs-on:
       group: linux-builders
-      labels: [self-hosted, linux, lightweight]
+      labels: [self-hosted, linux, t430]
     steps:
     - name: Cache Check
       run: |
-        echo "Warming up Python Pip and Poetry caches..."
         mkdir -p ~/.cache/pip ~/.cache/pypoetry
-        # Pre-install common libraries to pip cache
         pip install --user --upgrade pip setuptools wheel
         pip install --user requests urllib3 poetry pydantic pytest black

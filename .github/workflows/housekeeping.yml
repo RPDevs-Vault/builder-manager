@@ -3,35 +3,35 @@ name: Fleet Housekeeping
 on:
   schedule:
   - cron: '0 3 * * 0'   # 3 AM every Sunday
-  workflow_dispatch: # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   cleanup:
-    name: Runner Maintenance
+    name: Runner Maintenance (${{ matrix.target_node }})
+    strategy:
+      matrix:
+        target_node: [t430, llmadmin01]
     runs-on:
       group: linux-builders
-      labels: [self-hosted, linux, heavy]
+      labels: [self-hosted, linux, "${{ matrix.target_node }}"]
     steps:
     - name: Prune Docker Layers
       run: |
-        echo "Pruning unused Docker data..."
-        docker system prune -af --filter "until=168h" # Remove everything older than 7 days, preserve volumes
+        echo "Pruning unused Docker data on ${{ matrix.target_node }}..."
+        docker system prune -af --filter "until=168h"
 
     - name: Clean Workspace Bloat
       run: |
-        echo "Cleaning temporary build artifacts..."
-        # Clean up any residual files in the work directory that are not part of the active run
-        find /home/runner/_work/ -type d -name "build" -mtime +30 -exec rm -rf {} +
+        if [ -n "$RUNNER_WORKSPACE" ] && [ -d "$RUNNER_WORKSPACE" ]; then
+          find "$RUNNER_WORKSPACE" -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} + || true
+        fi
 
-    - name: Clear Ccache (Optional)
+    - name: Clear Ccache
       run: |
         if command -v ccache >/dev/null; then
-          echo "Optimizing compiler cache..."
           ccache -c
           ccache -z
         fi
 
     - name: Disk Space Audit
-      run: |
-        echo "### 📊 Disk Usage Post-Cleanup"
-        df -h | grep -E "Filesystem|largedata|root"
+      run: df -h | grep -E "Filesystem|largedata|root"

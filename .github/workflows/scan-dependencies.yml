@@ -11,9 +11,7 @@ permissions:
 jobs:
   scan-and-registry:
     name: Scan & Update Registry
-    runs-on:
-      group: linux-builders
-      labels: [self-hosted, linux64, lightweight]
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
@@ -25,16 +23,13 @@ jobs:
 
     - name: Run Dependency Scanner
       env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GH_PAT || secrets.GITHUB_TOKEN
-          }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: python dependency/scan_dependencies.py
 
     - name: Commit and Push Changes
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-        # Only commit if dependency_registry.json has changes
         if git status --porcelain | grep -q "dependency_registry.json"; then
           git add dependency_registry.json
           git commit -m "chore: auto-update dependency registry [skip ci]"

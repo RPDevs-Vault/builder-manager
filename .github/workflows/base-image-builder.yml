@@ -4,10 +4,8 @@ on:
   schedule:
   - cron: '0 4 * * 1'   # Weekly on Mondays at 04:00
   push:
-    branches:
-    - main
-    paths:
-    - 'container/base-images/**'
+    branches: [main]
+    paths: ['container/base-images/**']
   workflow_dispatch:
 
 env:
@@ -16,15 +14,13 @@ env:
 
 jobs:
   build-and-scan:
-    name: Build & Scan Base Images
     runs-on:
       group: linux-builders
-      labels: [self-hosted, linux, heavy]
+      labels: [self-hosted, linux, t430]
     permissions:
       contents: read
       packages: write
       security-events: write
-
     strategy:
       matrix:
         image: [alpine, ubuntu]
@@ -44,7 +40,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.SYNC_TOKEN }}
 
-    - name: Extract metadata (tags, labels) for Docker
+    - name: Extract metadata
       id: meta
       uses: docker/metadata-action@v5
       with:
@@ -53,7 +49,7 @@ jobs:
           type=raw,value=latest
           type=sha,format=short
 
-    - name: Build Docker image (load locally for scanning)
+    - name: Build Docker image
       uses: docker/build-push-action@v5
       with:
         context: ./container/base-images/${{ matrix.image }}
@@ -61,14 +57,14 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
-    - name: Run Trivy vulnerability scanner
+    - name: Run Trivy scanner
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: '${{ env.REGISTRY }}/${{ env.ORG }}/base-${{ matrix.image }}:latest'
         format: 'sarif'
         output: 'trivy-results-${{ matrix.image }}.sarif'
         severity: 'CRITICAL,HIGH'
-        exit-code: '0'   # Don't break the build yet, just report
+        exit-code: '0'
 
     - name: Push Docker image
       uses: docker/build-push-action@v5

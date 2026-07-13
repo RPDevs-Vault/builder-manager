@@ -12,12 +12,10 @@ on:
 
 jobs:
   mirror:
-    runs-on:
-      group: linux-builders
-      labels: [self-hosted, linux, lightweight]
+    runs-on: ubuntu-latest
     steps:
     - name: Login to GHCR
-      uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9   # v3
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
@@ -29,7 +27,9 @@ jobs:
         TAG_NAME="${{ github.event.inputs.target_name }}"
 
         if [ -z "$TAG_NAME" ]; then
-          TAG_NAME=$(echo "$IMAGE" | rev | cut -d/ -f1 | rev | cut -d: -f1)
+          CLEAN_IMAGE="${IMAGE%%@*}"
+          BASENAME="${CLEAN_IMAGE##*/}"
+          TAG_NAME="${BASENAME%%:*}"
         fi
 
         TARGET="ghcr.io/rpdevs-vault/$TAG_NAME:latest"

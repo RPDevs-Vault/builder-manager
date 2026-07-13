@@ -20,40 +20,25 @@ on:
 jobs:
   setup-matrix:
     name: Fleet Matrix Setup
-    runs-on:
-      group: linux-builders
-      labels:
-      - self-hosted
-      - linux
-
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       runner: ${{ steps.check-runner.outputs.runner }}
     steps:
     - name: Checkout
-      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5   # v4
+      uses: actions/checkout@v4
 
     - id: check-runner
       name: Check Local Runner Status
       env:
         GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
       run: |
-        RUNNER_STATUS=$(gh api /orgs/RPDevs-Vault/actions/runners --jq '.runners[] | select(.labels[].name == "heavy") | .status' | grep "online" | head -n 1)
-        if [ "$RUNNER_STATUS" != "online" ]; then
-          echo "runner=\"ubuntu-latest\"" >> $GITHUB_OUTPUT
-          echo "Local heavy runner offline. Falling back to ubuntu-latest."
-          exit 0
-        fi
-
-        # Get last 3 successful runs to evaluate historical duration
+        # Assess fallback or escalation to llmadmin01
         RUNS=$(gh api /repos/${{ github.repository }}/actions/workflows/build-engine.yml/runs?status=success\&per_page=3)
-        
         TOTAL_DURATION=0
         COUNT=0
         for row in $(echo "${RUNS}" | jq -r '.workflow_runs[] | @base64'); do
-            _jq() {
-             echo ${row} | base64 --decode | jq -r ${1}
-            }
+            _jq() { echo ${row} | base64 --decode | jq -r ${1}; }
             CREATED=$(_jq '.created_at')
             UPDATED=$(_jq '.updated_at')
             START=$(date -d "$CREATED" +%s)
@@ -65,61 +50,49 @@ jobs:
 
         if [ $COUNT -gt 0 ]; then
           AVG=$((TOTAL_DURATION / COUNT))
-          echo "Average duration of last $COUNT runs: ${AVG}s"
           if [ $AVG -gt 900 ]; then
-             echo "Average duration > 15m. Escalating to heavy runner."
-             echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"heavy\"]}" >> $GITHUB_OUTPUT
+             echo "Average duration > 15m. Escalating to llmadmin01."
+             echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"linux\",\"llmadmin01\"]}" >> $GITHUB_OUTPUT
           else
-             echo "Average duration <= 15m. Routing to lightweight runner."
-             echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"lightweight\"]}" >> $GITHUB_OUTPUT
+             echo "Average duration <= 15m. Routing to t430."
+             echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"linux\",\"t430\"]}" >> $GITHUB_OUTPUT
           fi
         else
-          echo "No historical data. Defaulting to lightweight runner."
-          echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"lightweight\"]}" >> $GITHUB_OUTPUT
+          echo "No historical data. Defaulting to t430."
+          echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"linux\",\"t430\"]}" >> $GITHUB_OUTPUT
         fi
 
     - id: set-matrix
       name: Generate Build Matrix
       run: |
-        # 1. Collect local builds
         LOCAL_JSON=$(ls -d build/*/ 2>/dev/null | xargs -n 1 basename | jq -R -s -c 'split("\n")[:-1] | map({name: ., source: "local", dir: "build/\(.)"})')
-        if [ -z "$LOCAL_JSON" ]; then LOCAL_JSON="[]"; fi
-
-        # 2. Collect runners
+        [ -z "$LOCAL_JSON" ] && LOCAL_JSON="[]"
         RUNNER_JSON=$(ls -d runners/*/ 2>/dev/null | xargs -n 1 basename | jq -R -s -c 'split("\n")[:-1] | map({name: "runner-\(.)", source: "runner", dir: "runners/\(.)"})')
-        if [ -z "$RUNNER_JSON" ]; then RUNNER_JSON="[]"; fi
-
-        # 3. Collect manifest projects
+        [ -z "$RUNNER_JSON" ] && RUNNER_JSON="[]"
         MANIFEST_JSON=$(yq -o=json -c '.projects // []' manifest.yaml | jq -c 'map(. + {source: "manifest", dir: "build/\(.name)"})')
-
-        # Merge all into a single array and ensure unique projects by name
         FULL_MATRIX=$(echo "$LOCAL_JSON $RUNNER_JSON $MANIFEST_JSON" | jq -s -c 'add | unique_by(.name) | if length == 0 then [{"name":"dummy","source":"dummy","dir":"dummy"}] else . end')
         echo "matrix=$FULL_MATRIX" >> $GITHUB_OUTPUT
 
   build:
     name: Build (${{ matrix.project.name }})
     needs: setup-matrix
-    if: needs.setup-matrix.outputs.matrix != '[]' && 
-      needs.setup-matrix.outputs.matrix != ''
+    if: needs.setup-matrix.outputs.matrix != '[]' && needs.setup-matrix.outputs.matrix != ''
     strategy:
       fail-fast: false
       matrix:
         project: ${{ fromJSON(needs.setup-matrix.outputs.matrix) }}
-
     runs-on: ${{ fromJSON(needs.setup-matrix.outputs.runner) }}
 
     steps:
     - name: Checkout
-      uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5   # v4
+      uses: actions/checkout@v4
       with:
         token: ${{ secrets.SYNC_TOKEN }}
 
     - name: Pre-Flight Validation
       run: |
         if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
-        echo "Checking environment for ${{ matrix.project.name }}..."
         DIR="${{ matrix.project.dir }}"
-
         if [[ "${{ matrix.project.source }}" == "local" || "${{ matrix.project.source }}" == "runner" ]]; then
           if [ ! -d "$DIR" ]; then
             echo "::error::Source directory $DIR not found!"
@@ -134,31 +107,22 @@ jobs:
         CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
       run: |
         if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
-        echo "Installing NFS Common and Cloudflared..."
         sudo apt-get update && sudo apt-get install -y nfs-common
         curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
         sudo dpkg -i cloudflared.deb
-
-        echo "Starting Cloudflare Tunnel mapping..."
         export TUNNEL_SERVICE_TOKEN_ID=$CF_CLIENT_ID
         export TUNNEL_SERVICE_TOKEN_SECRET=$CF_CLIENT_SECRET
         cloudflared access tcp --hostname nfs-sharedroot.iamrp.dev --url 127.0.0.1:2049 &
-
-        echo "Waiting for tunnel to initialize..."
         sleep 5
-
-        echo "Mounting NFS Cache via Cloudflare Tunnel..."
         sudo mkdir -p /home/runner/shared
         sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot /home/runner/shared
 
     - name: Set up QEMU
-      uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130   # v3
-
+      uses: docker/setup-qemu-action@v3
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f   # v3
-
+      uses: docker/setup-buildx-action@v3
     - name: Login to GHCR
-      uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9   # v3
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
@@ -171,13 +135,10 @@ jobs:
         DIR="${{ matrix.project.dir }}"
         URL="${{ matrix.project.source_url || matrix.project.url }}"
         BRANCH="${{ matrix.project.branch || 'main' }}"
-
         if [[ "${{ matrix.project.source }}" == "manifest" || "${{ matrix.project.source }}" == "thirdparty" ]]; then
-          echo "Cloning $NAME from $URL ($BRANCH)..."
           mkdir -p build
           rm -rf "$DIR"
-          git clone --depth 1 --branch "$BRANCH" "$URL" "$DIR" || \
-          git clone --depth 1 --branch "master" "$URL" "$DIR" || echo "Failed to clone $NAME"
+          git clone --depth 1 --branch "$BRANCH" "$URL" "$DIR" || git clone --depth 1 --branch "master" "$URL" "$DIR" || echo "Failed to clone $NAME"
         fi
 
     - name: Archive and Organize
@@ -185,12 +146,10 @@ jobs:
         if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
         NAME="${{ matrix.project.name }}"
         DIR="${{ matrix.project.dir }}"
-
         if [ -d "$DIR" ]; then
           rm -rf "$DIR/.git" 2>/dev/null || true
           mkdir -p "containers/$NAME"
           IMAGE_NAME="ghcr.io/rpdevs-vault/${NAME,,}"
-          
           echo "docker run -d --name $NAME $IMAGE_NAME:latest" > "containers/$NAME/command.txt"
           
           echo "# 📦 $NAME" > "containers/$NAME/README.md"
@@ -204,8 +163,8 @@ jobs:
           echo "Image: \`$IMAGE_NAME:latest\`" >> "images/$NAME.md"
           echo "Registry: [GHCR](https://github.com/orgs/RPDevs-Vault/packages/container/${NAME,,})" >> "images/$NAME.md"
 
-          git config user.name "Fleet Archiver"
-          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
           if ! git diff --staged --quiet; then
             git commit -m "chore(archiver): update $NAME source and assets"
@@ -222,22 +181,21 @@ jobs:
         IMAGE_NAME="ghcr.io/rpdevs-vault/${NAME,,}"
 
         if [ -f "$DIR/Dockerfile" ] || [ -f "$DIR/dockerfile" ]; then
-          echo "Building $NAME..."
           DOCKERFILE=$(ls "$DIR" | grep -i "^dockerfile$" | head -n 1)
-          
-          # Extract platforms from manifest or default to amd64,arm64
           PLATFORMS="${{ matrix.project.platforms && join(matrix.project.platforms, ',') || 'linux/amd64,linux/arm64' }}"
-          
           docker buildx build --platform "$PLATFORMS" \
             --cache-from type=local,src=/home/runner/shared/docker-cache/${{ matrix.project.name }} \
             --cache-to type=local,dest=/home/runner/shared/docker-cache/${{ matrix.project.name }},mode=max \
             -f "$DIR/$DOCKERFILE" -t "$IMAGE_NAME:latest" --push "$DIR"
-        else
-          echo "No Dockerfile found in $DIR. Skipping build."
         fi
+
+    - name: Cleanup NFS and Cloudflare Tunnel
+      if: always() && !contains(runner.labels, 'self-hosted')
+      run: |
+        sudo umount -f /home/runner/shared || true
+        sudo pkill -f cloudflared || true
 
     - name: Runner Housekeeping
       if: always() && contains(runner.labels, 'self-hosted')
       run: |
-        echo "Pruning temporary build images..."
         docker image prune -f --filter "label=com.github.actions.runner" || true

@@ -6,20 +6,17 @@ concurrency:
 
 on:
   schedule:
-  - cron: '0 0 * * 1'   # Weekly on Monday at 00:00
+  - cron: '0 0 * * 1'
   workflow_dispatch:
 
 jobs:
   audit:
-    runs-on:
-      group: linux-builders
-      labels: [self-hosted, linux, lightweight]
+    runs-on: ubuntu-latest
     steps:
     - name: Audit Organization Packages
       env:
         GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
       run: |
-        # Fetch all container packages in the organization
         PACKAGES=$(gh api /orgs/RPDevs-Vault/packages?package_type=container --paginate)
 
         if [[ $(echo "$PACKAGES" | jq 'length') -eq 0 ]]; then
@@ -36,10 +33,7 @@ jobs:
           NAME=$(echo "$pkg" | jq -r '.name')
           VISIBILITY=$(echo "$pkg" | jq -r '.visibility')
           UPDATED=$(echo "$pkg" | jq -r '.updated_at')
-          
-          # Fetch version count
           VERSIONS=$(gh api "/orgs/RPDevs-Vault/packages/container/$NAME/versions" --jq 'length')
-          
           echo "| \`$NAME\` | $VISIBILITY | $VERSIONS | $UPDATED |" >> $REPORT
         done
 
