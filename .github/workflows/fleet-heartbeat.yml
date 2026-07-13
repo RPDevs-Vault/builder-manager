@@ -19,23 +19,23 @@ jobs:
         RUNNERS_JSON=$(gh api /orgs/RPDevs-Vault/actions/runners)
 
         # Extract statuses based on the specific hardware labels we set earlier
-        T430_STATUS=$(echo "$RUNNERS_JSON" | jq -r '.runners[] | select(.labels[].name == "t430") | .status' | head -n 1)
-        LLM_STATUS=$(echo "$RUNNERS_JSON" | jq -r '.runners[] | select(.labels[].name == "llmadmin01") | .status' | head -n 1)
+        T430_STATUS=$(echo "$RUNNERS_JSON" | jq -r '.runners[] | select(.labels[].name == "lite") | .status' | head -n 1)
+        LLM_STATUS=$(echo "$RUNNERS_JSON" | jq -r '.runners[] | select(.labels[].name == "heavy") | .status' | head -n 1)
 
         echo "T430 (Cache Hub): ${T430_STATUS:-Not Found}"
         echo "LLMAdmin01 (Heavy Lifter): ${LLM_STATUS:-Not Found}"
 
-        # Flag individual runners if they are offline
-        if [[ "$T430_STATUS" != "online" ]]; then
+        # Flag individual runners if they are offline (Strict POSIX syntax)
+        if [ "$T430_STATUS" != "online" ]; then
           echo "t430_down=true" >> $GITHUB_OUTPUT
         fi
 
-        if [[ "$LLM_STATUS" != "online" ]]; then
+        if [ "$LLM_STATUS" != "online" ]; then
           echo "llm_down=true" >> $GITHUB_OUTPUT
         fi
 
         # If any core infrastructure is down, fail the step to trigger alerts
-        if [[ "$T430_STATUS" != "online" ]] || [[ "$LLM_STATUS" != "online" ]]; then
+        if [ "$T430_STATUS" != "online" ] || [ "$LLM_STATUS" != "online" ]; then
           echo "::error::One or more mission-critical runners are offline!"
           exit 1
         fi
@@ -44,7 +44,9 @@ jobs:
       if: success()
       run: |
         if [ -n "${{ secrets.UPTIME_KUMA_PUSH_URL }}" ]; then
-          curl -s "${{ secrets.UPTIME_KUMA_PUSH_URL }}?status=up&msg=Fleet+Online"
+          # Safely strip any accidental query parameters from the secret URL
+          BASE_URL=$(echo "${{ secrets.UPTIME_KUMA_PUSH_URL }}" | cut -d '?' -f 1)
+          curl -s "${BASE_URL}?status=up&msg=Fleet+Online"
         else
           echo "⚠️ UPTIME_KUMA_PUSH_URL secret is missing. Skipping Kuma ping."
         fi
@@ -53,7 +55,9 @@ jobs:
       if: failure()
       run: |
         if [ -n "${{ secrets.UPTIME_KUMA_PUSH_URL }}" ]; then
-          curl -s "${{ secrets.UPTIME_KUMA_PUSH_URL }}?status=down&msg=Runners+Offline"
+          # Safely strip any accidental query parameters from the secret URL
+          BASE_URL=$(echo "${{ secrets.UPTIME_KUMA_PUSH_URL }}" | cut -d '?' -f 1)
+          curl -s "${BASE_URL}?status=down&msg=Runners+Offline"
         fi
 
     - name: Alert ntfy.sh (T430 Offline)
