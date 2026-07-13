@@ -1,0 +1,1 @@
+docker run -d --name docingest ghcr.io/rpdevs-vault/docingest:latest
