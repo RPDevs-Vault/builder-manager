@@ -37,7 +37,7 @@ jobs:
         TOTAL_DURATION=0
         COUNT=0
         for row in $(echo "${RUNS}" | jq -r '.workflow_runs[] | @base64'); do
-            _jq() { echo ${row} \vert{} base64 --decode \vert{} jq -r${1}; }
+            _jq() { echo ${row} | base64 --decode | jq -r ${1}; }
             CREATED=$(_jq '.created_at')
             UPDATED=$(_jq '.updated_at')
             START=$(date -d "$CREATED" +%s)
@@ -69,7 +69,7 @@ jobs:
         RUNNER_JSON=$(ls -d runners/*/ 2>/dev/null | xargs -n 1 basename | jq -R -s -c 'split("\n")[:-1] | map({name: "runner-\(.)", source: "runner", dir: "runners/\(.)"})')
         [ -z "$RUNNER_JSON" ] && RUNNER_JSON="[]"
         MANIFEST_JSON=$(yq -o=json -c '.projects // []' manifest.yaml | jq -c 'map(. + {source: "manifest", dir: "build/\(.name)"})')
-        FULL_MATRIX=$(echo "$LOCAL_JSON $RUNNER_JSON$MANIFEST_JSON" | jq -s -c 'add | unique_by(.name) | if length == 0 then [{"name":"dummy","source":"dummy","dir":"dummy"}] else . end')
+        FULL_MATRIX=$(echo "$LOCAL_JSON $RUNNER_JSON $MANIFEST_JSON" | jq -s -c 'add | unique_by(.name) | if length == 0 then [{"name":"dummy","source":"dummy","dir":"dummy"}] else . end')
         echo "matrix=$FULL_MATRIX" >> $GITHUB_OUTPUT
 
   build:
@@ -90,9 +90,9 @@ jobs:
 
     - name: Pre-Flight Validation
       run: |
-        if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
+        if [ "${{ matrix.project.name }}" = "dummy" ]; then exit 0; fi
         DIR="${{ matrix.project.dir }}"
-        if [[ "${{ matrix.project.source }}" == "local" \vert{}\vert{} "${{ matrix.project.source }}" == "runner" ]]; then
+        if [ "${{ matrix.project.source }}" = "local" ] || [ "${{ matrix.project.source }}" = "runner" ]; then
           if [ ! -d "$DIR" ]; then
             echo "::error::Source directory $DIR not found!"
             exit 1
@@ -105,7 +105,7 @@ jobs:
         CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
         CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
       run: |
-        if [ "${{ matrix.project.name }}" == "dummy" ]; then exit 0; fi
+        if [ "${{ matrix.project.name }}" = "dummy" ]; then exit 0; fi
         sudo apt-get update && sudo apt-get install -y nfs-common
         curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
         sudo dpkg -i cloudflared.deb
@@ -119,7 +119,132 @@ jobs:
     - name: Set Universal Cache Path
       id: cache-path
       run: |
-        if [[ "${{ contains(needs.setup-matrix.outputs.runner, 'self-hosted') }}" == "true" ]]; then
+        if [ "${{ contains(needs.setup-matrix.outputs.runner, 'self-hosted') }}" = "true" ]; then
           echo "CACHE_BASE=/mnt/sharedroot/github_runners/shared" >> $GITHUB_ENV
         else
           echo "CACHE_BASE=/mnt/shared" >> $GITHUB_ENV
+        fi
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        # Safely capped at 35GB to allow CUDA extraction without starving the host drive
+        buildkitd-config-inline: |
+          [worker.oci]
+            max-parallelism = 4
+          [[worker.oci.gcpolicy]]
+            keepBytes = "35GB"
+            keepDuration = "336h"
+            filters = [ "type==source.local", "type==exec.cachemount", "type==custom.source"]
+          [[worker.oci.gcpolicy]]
+            all = true
+            keepBytes = "35GB"
+
+    - name: Login to GHCR
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.SYNC_TOKEN }}
+
+    - name: Prepare Source
+      run: |
+        if [ "${{ matrix.project.name }}" = "dummy" ]; then exit 0; fi
+        DIR="${{ matrix.project.dir }}"
+        URL="${{ matrix.project.source_url || matrix.project.url }}"
+        BRANCH="${{ matrix.project.branch || 'main' }}"
+        if [ "${{ matrix.project.source }}" = "manifest" ] || [ "${{ matrix.project.source }}" = "thirdparty" ]; then
+          mkdir -p build
+          rm -rf "$DIR"
+          git clone --depth 1 --branch "$BRANCH" "$URL" "$DIR" || git clone --depth 1 --branch "master" "$URL" "$DIR"
+        fi
+
+    - name: Patch Upstream Dockerfiles (Pre-Build Optimization)
+      run: |
+        if [ "${{ matrix.project.name }}" = "dummy" ]; then exit 0; fi
+        NAME="${{ matrix.project.name }}"
+        DIR="${{ matrix.project.dir }}"
+        
+        # POSIX-compliant lowercase conversion
+        NAME_LOWER=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+        
+        # Only run this patch if the project is Ollama
+        if [ "$NAME_LOWER" = "ollama" ]; then
+          echo "🛠️ Patching Ollama Dockerfile for Layer Optimization..."
+          DOCKERFILE=$(ls "$DIR" | grep -i "^dockerfile$" | head -n 1)
+          
+          # Use sed to find the end of the DNF install chain and append the cache cleanup
+          sed -i 's/&& dnf install -y libnccl libnccl-devel/&& dnf install -y libnccl libnccl-devel \\\\\n    && dnf clean all \\\\\n    && rm -rf \/var\/cache\/dnf/g' "$DIR/$DOCKERFILE"
+          
+          echo "✅ Patch applied successfully. Here is the modified CUDA block:"
+          grep -A 3 -B 3 "dnf clean all" "$DIR/$DOCKERFILE" || true
+        fi
+
+    - name: Archive and Organize
+      run: |
+        if [ "${{ matrix.project.name }}" = "dummy" ]; then exit 0; fi
+        NAME="${{ matrix.project.name }}"
+        DIR="${{ matrix.project.dir }}"
+        
+        if [ -d "$DIR" ]; then
+          rm -rf "$DIR/.git" 2>/dev/null || true
+          mkdir -p "containers/$NAME"
+          
+          # POSIX-compliant lowercase conversion
+          NAME_LOWER=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+          IMAGE_NAME="ghcr.io/rpdevs-vault/$NAME_LOWER"
+          
+          echo "docker run -d --name $NAME $IMAGE_NAME:latest" > "containers/$NAME/command.txt"
+          
+          mkdir -p images
+          echo "# 📦 $NAME" > "images/$NAME.md"
+          echo "Image: \`$IMAGE_NAME:latest\`" >> "images/$NAME.md"
+
+          # Git config with explicitly disabled GPG signing for the bot
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config commit.gpgsign false
+
+          git add .
+          if ! git diff --staged --quiet; then
+            git commit -m "chore(archiver): update $NAME source and assets"
+            git pull origin main --rebase
+            git push origin main
+          fi
+        fi
+
+    - name: Build and Push
+      run: |
+        if [ "${{ matrix.project.name }}" = "dummy" ]; then exit 0; fi
+        NAME="${{ matrix.project.name }}"
+        DIR="${{ matrix.project.dir }}"
+        
+        # POSIX-compliant lowercase conversion
+        NAME_LOWER=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+        IMAGE_NAME="ghcr.io/rpdevs-vault/$NAME_LOWER"
+
+        if [ -f "$DIR/Dockerfile" ] || [ -f "$DIR/dockerfile" ]; then
+          DOCKERFILE=$(ls "$DIR" | grep -i "^dockerfile$" | head -n 1)
+          PLATFORMS="${{ matrix.project.platforms && join(matrix.project.platforms, ',') || 'linux/amd64,linux/arm64' }}"
+          
+          mkdir -p ${CACHE_BASE}/docker-cache/${{ matrix.project.name }}
+          
+          docker buildx build --platform "$PLATFORMS" \
+            --cache-from type=local,src=${CACHE_BASE}/docker-cache/${{ matrix.project.name }} \
+            --cache-to type=local,dest=${CACHE_BASE}/docker-cache/${{ matrix.project.name }},mode=max \
+            -f "$DIR/$DOCKERFILE" -t "$IMAGE_NAME:latest" --push "$DIR"
+        fi
+
+    - name: Cleanup NFS and Cloudflare Tunnel
+      if: always() && !contains(needs.setup-matrix.outputs.runner, 'self-hosted')
+      run: |
+        sudo umount -f /mnt/shared || true
+        sudo pkill -f cloudflared || true
+
+    - name: Runner Housekeeping
+      if: always() && contains(needs.setup-matrix.outputs.runner, 'self-hosted')
+      run: |
+        docker image prune -f --filter "label=com.github.actions.runner" || true
