@@ -11,9 +11,11 @@ on:
 env:
   REGISTRY: ghcr.io
   ORG: rpdevs-vault
+  CACHE_BASE: /mnt/sharedroot/github_runners/shared
 
 jobs:
   build-and-scan:
+    name: Build & Scan Base Images
     runs-on:
       group: linux-builders
       labels: [self-hosted, linux, t430]
@@ -21,6 +23,7 @@ jobs:
       contents: read
       packages: write
       security-events: write
+
     strategy:
       matrix:
         image: [alpine, ubuntu]
@@ -49,15 +52,20 @@ jobs:
           type=raw,value=latest
           type=sha,format=short
 
-    - name: Build Docker image
+    - name: Ensure Local Cache Directory Exists
+      run: mkdir -p ${{ env.CACHE_BASE }}/docker-cache/base-${{ matrix.image }}
+
+    - name: Build Docker image (Load Locally for Scanning)
       uses: docker/build-push-action@v5
       with:
         context: ./container/base-images/${{ matrix.image }}
         load: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        # Pull from the local cache, but don't overwrite it until the final push step
+        cache-from: type=local,src=${{ env.CACHE_BASE }}/docker-cache/base-${{ matrix.image }}
 
-    - name: Run Trivy scanner
+    - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@master
       with:
         image-ref: '${{ env.REGISTRY }}/${{ env.ORG }}/base-${{ matrix.image }}:latest'
@@ -66,10 +74,13 @@ jobs:
         severity: 'CRITICAL,HIGH'
         exit-code: '0'
 
-    - name: Push Docker image
+    - name: Push Docker image and Update Cache
       uses: docker/build-push-action@v5
       with:
         context: ./container/base-images/${{ matrix.image }}
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=local,src=${{ env.CACHE_BASE }}/docker-cache/base-${{ matrix.image }}
+        # Push successful layers into the permanent NFS cache
+        cache-to: type=local,dest=${{ env.CACHE_BASE }}/docker-cache/base-${{ matrix.image }},mode=max

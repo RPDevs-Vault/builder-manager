@@ -5,6 +5,9 @@ on:
   - cron: '0 3 * * 0'   # 3 AM every Sunday
   workflow_dispatch:
 
+env:
+  CACHE_BASE: /mnt/sharedroot/github_runners/shared
+
 jobs:
   cleanup:
     name: Runner Maintenance (${{ matrix.target_node }})
@@ -15,9 +18,9 @@ jobs:
       group: linux-builders
       labels: [self-hosted, linux, "${{ matrix.target_node }}"]
     steps:
-    - name: Prune Docker Layers
+    - name: Prune Local Docker Daemons
       run: |
-        echo "Pruning unused Docker data on ${{ matrix.target_node }}..."
+        echo "Pruning unused internal Docker daemon data on ${{ matrix.target_node }}..."
         docker system prune -af --filter "until=168h"
 
     - name: Clean Workspace Bloat
@@ -26,12 +29,24 @@ jobs:
           find "$RUNNER_WORKSPACE" -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} + || true
         fi
 
-    - name: Clear Ccache
+    - name: Centralized NFS Cache Maintenance
+      # Only run this step once on the T430 to prevent parallel cache-file corruption
+      if: matrix.target_node == 't430'
       run: |
+        echo "Performing maintenance on NFS persistent caches..."
+        
+        # 1. Enforce C++ Ccache limits
+        export CCACHE_DIR=$CACHE_BASE/ccache
         if command -v ccache >/dev/null; then
-          ccache -c
-          ccache -z
+          echo "Enforcing 50GB limit on Ccache..."
+          ccache --max-size=50G
+          ccache --cleanup
+          ccache -s
         fi
+        
+        # 2. Prune old Docker buildx cache layers (not accessed in 30 days)
+        echo "Pruning stagnant Docker build layers..."
+        find $CACHE_BASE/docker-cache -type f -atime +30 -delete || true
 
     - name: Disk Space Audit
-      run: df -h | grep -E "Filesystem|largedata|root"
+      run: df -h | grep -E "Filesystem|largedata|root|sharedroot"
