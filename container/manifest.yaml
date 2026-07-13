@@ -37,5 +37,10 @@ projects:
     branch: main
     platforms: [linux/amd64, linux/arm64]
 
+  - name: docingest
+    source_url: https://github.com/Amal-David/docingest.git
+    branch: main
+    platforms: [linux/amd64, linux/arm64]
+
 containers:
   # Deployment definitions
