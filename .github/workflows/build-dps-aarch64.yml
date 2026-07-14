@@ -1,0 +1,51 @@
+name: Compile Mageddo DPS (aarch64)
+
+on:
+  workflow_dispatch: # Allows manual trigger from the GitHub Actions UI
+
+env:
+  REGISTRY: ghcr.io
+  # Converts repository owner to lowercase for Docker registry compliance
+  IMAGE_NAME: ${{ github.repository_owner }}/dns-proxy-server-aarch64
+
+jobs:
+  build-and-push:
+    # Crucial: Use the native ARM64 runner to prevent QEMU compilation timeouts
+    runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout Mageddo Source
+        uses: actions/checkout@v4
+        with:
+          repository: mageddo/dns-proxy-server
+          ref: master # Replace with a specific tag (e.g., '3.3.0') for production stability
+
+      - name: Authenticate to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Execute Mageddo Build Chain
+        run: |
+          # 1. Build the aarch64 compile environment
+          docker compose build build-linux-aarch64
+          
+          # 2. Execute the native compilation within the builder container
+          docker compose run --rm build-linux-aarch64
+          
+          # 3. Package the final compiled binary into the runtime image
+          docker compose build image-linux-aarch64
+
+      - name: Tag and Push to GHCR
+        run: |
+          # Convert username to lowercase to satisfy Docker naming rules
+          LOWER_REPO=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
+          
+          # Mageddo's compose file outputs the local tag defreitas/dns-proxy-server:snapshot-aarch64
+          docker tag defreitas/dns-proxy-server:snapshot-aarch64 $LOWER_REPO:latest
+          docker push $LOWER_REPO:latest
