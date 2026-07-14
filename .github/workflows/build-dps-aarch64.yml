@@ -21,7 +21,6 @@ jobs:
           repository: mageddo/dns-proxy-server
           ref: master
 
-      # --- NEW: Setup Java Environment ---
       - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
@@ -29,12 +28,9 @@ jobs:
           java-version: '21'
           cache: 'gradle'
 
-      # --- NEW: Compile Java & Prepare GraalVM Artifacts ---
       - name: Compile Java Artifacts
         run: |
           chmod +x ./gradlew
-          # Compiles the source and generates the ./build/artifacts/native-image-source directory
-          # Skipping tests (-x test) to speed up the compilation pipeline
           ./gradlew clean build -x test
 
       - name: Authenticate to GitHub Container Registry
@@ -42,10 +38,13 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GH_TOKEN }}
 
       - name: Execute Mageddo Docker Build Chain
         run: |
+          # Failsafe: Create the required directory to satisfy Docker's COPY command
+          mkdir -p ./build/artifacts/native-image-source/
+          
           # 1. Build the aarch64 compile environment
           docker compose build build-linux-aarch64
           
