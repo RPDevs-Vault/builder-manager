@@ -56,14 +56,13 @@ jobs:
           # 3. Build the aarch64 native compilation sandbox environment (Compiles the binary INSIDE the image)
           docker compose build build-linux-aarch64
           
-          # 4. 🚨 ARTIFACT EXTRACTION BRIDGE 🚨
-          # Create the host target directory
+          # 4. ARTIFACT EXTRACTION BRIDGE
           mkdir -p ./build/artifacts/linux-aarch64/
           
-          # Spin up the builder image, mount the host directory, and copy the trapped binary out to the GitHub runner
+          # Spin up the builder image, mount the host directory, and copy the relocated binary out to the GitHub runner
           docker compose run --rm --entrypoint "" \
             -v ${{ github.workspace }}/build/artifacts/linux-aarch64:/output \
-            build-linux-aarch64 cp /app/build/dns-proxy-server /output/
+            build-linux-aarch64 cp /app/build/artifacts/linux-aarch64/dns-proxy-server /output/
           
           # Verify extraction succeeded
           ls -lha ./build/artifacts/linux-aarch64/
