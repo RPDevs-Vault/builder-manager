@@ -42,16 +42,28 @@ jobs:
 
       - name: Execute Mageddo Docker Build Chain
         run: |
-          # Failsafe: Create the required directory to satisfy Docker's COPY command
+          # 1. Ensure target staging structures exist
           mkdir -p ./build/artifacts/native-image-source/
           
-          # 1. Build the aarch64 compile environment
+          # 2. Locate the compiled fat JAR, strip versioning, and stage it for Docker context ingestion
+          # This handles both version-appended jars and standard layouts dynamically
+          FOUND_JAR=$(find build/libs/ -name "dns-proxy-server*.jar" ! -name "*javadoc*" ! -name "*sources*" | head -n 1)
+          if [ -z "$FOUND_JAR" ]; then
+            echo "[CRITICAL ERROR] Compiled application JAR could not be located in build/libs/"
+            ls -R build/
+            exit 1
+          fi
+          
+          echo "Staging artifact: $FOUND_JAR -> ./build/artifacts/native-image-source/dns-proxy-server.jar"
+          cp "$FOUND_JAR" ./build/artifacts/native-image-source/dns-proxy-server.jar
+          
+          # 3. Build the aarch64 native compilation sandbox environment
           docker compose build build-linux-aarch64
           
-          # 2. Execute the native compilation within the builder container
+          # 4. Execute the native-image ahead-of-time binary compilation inside the container
           docker compose run --rm build-linux-aarch64
           
-          # 3. Package the final compiled binary into the runtime image
+          # 5. Package the resulting static binary into the minimal execution image
           docker compose build image-linux-aarch64
 
       - name: Tag and Push to GHCR
