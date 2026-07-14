@@ -45,25 +45,30 @@ jobs:
           # 1. Ensure target staging structures exist
           mkdir -p ./build/artifacts/native-image-source/
           
-          # 2. Locate the compiled fat JAR, strip versioning, and stage it for Docker context ingestion
-          # This handles both version-appended jars and standard layouts dynamically
+          # 2. Locate the compiled fat JAR and stage it for Docker context ingestion
           FOUND_JAR=$(find build/libs/ -name "dns-proxy-server*.jar" ! -name "*javadoc*" ! -name "*sources*" | head -n 1)
           if [ -z "$FOUND_JAR" ]; then
             echo "[CRITICAL ERROR] Compiled application JAR could not be located in build/libs/"
-            ls -R build/
             exit 1
           fi
-          
-          echo "Staging artifact: $FOUND_JAR -> ./build/artifacts/native-image-source/dns-proxy-server.jar"
           cp "$FOUND_JAR" ./build/artifacts/native-image-source/dns-proxy-server.jar
           
-          # 3. Build the aarch64 native compilation sandbox environment
+          # 3. Build the aarch64 native compilation sandbox environment (Compiles the binary INSIDE the image)
           docker compose build build-linux-aarch64
           
-          # 4. Execute the native-image ahead-of-time binary compilation inside the container
-          docker compose run --rm build-linux-aarch64
+          # 4. 🚨 ARTIFACT EXTRACTION BRIDGE 🚨
+          # Create the host target directory
+          mkdir -p ./build/artifacts/linux-aarch64/
           
-          # 5. Package the resulting static binary into the minimal execution image
+          # Spin up the builder image, mount the host directory, and copy the trapped binary out to the GitHub runner
+          docker compose run --rm --entrypoint "" \
+            -v ${{ github.workspace }}/build/artifacts/linux-aarch64:/output \
+            build-linux-aarch64 cp /app/build/dns-proxy-server /output/
+          
+          # Verify extraction succeeded
+          ls -lha ./build/artifacts/linux-aarch64/
+          
+          # 5. Package the extracted static binary into the minimal execution image
           docker compose build image-linux-aarch64
 
       - name: Tag and Push to GHCR
