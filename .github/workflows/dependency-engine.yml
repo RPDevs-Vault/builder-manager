@@ -51,17 +51,16 @@ jobs:
         - platform: win64
           host_triplet: x86_64-w64-mingw32
           arch_name: win64
-          runner: '{"group": "windows-builders", "labels": ["windows-2022"]}'
+          runner: '{"group": "llmadmin01", "labels": ["self-hosted", "linux", "heavy"]}'
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
     - name: Setup Build Environment (Unix)
-      if: matrix.platform != 'win64'
       run: |
         sudo apt-get update || true
-        sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre ccache nasm gettext || true
+        sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre ccache nasm gettext mingw-w64 || true
 
     - name: Set Universal Cache Path
       id: cache-path
@@ -74,7 +73,6 @@ jobs:
         fi
 
     - name: Build Dependencies (Unix)
-      if: matrix.platform != 'win64'
       id: build_step
       run: |
         export CCACHE_DIR=$CACHE_BASE/ccache
@@ -96,16 +94,6 @@ jobs:
           exit 1
         }
         tail -n 50 build.log
-
-    - name: Build Dependencies (Windows)
-      if: matrix.platform == 'win64'
-      shell: cmd
-      run: |
-        git clone --depth 1 --branch "${{ github.event.inputs.kodi_branch || 'master' }}" https://github.com/xbmc/xbmc.git xbmc
-        cd xbmc\tools\buildsteps\windows\x64
-        call download-dependencies.bat
-        mkdir ..\..\..\..\..\compiled-artifacts
-        xcopy /E /I /Y %GITHUB_WORKSPACE%\container\xbmc\project\BuildDependencies %GITHUB_WORKSPACE%\container\dependencies\kodi\compiled-artifacts
 
     - name: Upload Build Log on Failure
       if: failure() && steps.build_step.outcome == 'failure'
