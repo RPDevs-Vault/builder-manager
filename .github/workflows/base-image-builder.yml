@@ -20,7 +20,7 @@ jobs:
       group: linux-builders
       labels: [self-hosted, linux, t430]
     permissions:
-      contents: read
+      contents: write
       packages: write
       security-events: write
 
@@ -32,6 +32,10 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
+
+    - name: Generate Version Number
+      id: version
+      run: echo "VERSION=$(date +'%Y.%m.%d.%H%M')" >> $GITHUB_OUTPUT
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -50,7 +54,10 @@ jobs:
         images: ${{ env.REGISTRY }}/${{ env.ORG }}/base-${{ matrix.image }}
         tags: |
           type=raw,value=latest
+          type=raw,value=${{ steps.version.outputs.VERSION }}
           type=sha,format=short
+        labels: |
+          org.opencontainers.image.source=https://github.com/${{ github.repository }}
 
     - name: Ensure Local Cache Directory Exists
       run: mkdir -p ${{ env.CACHE_BASE }}/docker-cache/base-${{ matrix.image }}
@@ -84,3 +91,11 @@ jobs:
         cache-from: type=local,src=${{ env.CACHE_BASE }}/docker-cache/base-${{ matrix.image }}
         # Push successful layers into the permanent NFS cache
         cache-to: type=local,dest=${{ env.CACHE_BASE }}/docker-cache/base-${{ matrix.image }},mode=max
+
+    - name: Create GitHub Release
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "base-${{ matrix.image }}-${{ steps.version.outputs.VERSION }}" \
+          --title "Release base-${{ matrix.image }}-${{ steps.version.outputs.VERSION }}" \
+          --notes "Base image release for ${{ matrix.image }} at version ${{ steps.version.outputs.VERSION }}"

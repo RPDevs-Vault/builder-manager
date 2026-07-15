@@ -11,7 +11,7 @@ jobs:
   build-and-push:
     runs-on: [self-hosted, linux64, llmadmin01]
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
@@ -20,6 +20,10 @@ jobs:
         with:
           repository: mageddo/dns-proxy-server
           ref: master
+
+      - name: Generate Version Number
+        id: version
+        run: echo "VERSION=$(date +'%Y.%m.%d.%H%M')" >> $GITHUB_OUTPUT
 
       - name: Setup Java 21
         uses: actions/setup-java@v4
@@ -70,8 +74,24 @@ jobs:
           # 5. Package the extracted static binary into the minimal execution image
           docker compose build image-linux-aarch64
 
-      - name: Tag and Push to GHCR
+      - name: Add OCI Label, Tag and Push to GHCR
         run: |
           LOWER_REPO=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
-          docker tag defreitas/dns-proxy-server:snapshot-aarch64 $LOWER_REPO:latest
+          
+          # Create inline Dockerfile.label to apply source repository metadata
+          printf "FROM defreitas/dns-proxy-server:snapshot-aarch64\nLABEL org.opencontainers.image.source=\"https://github.com/${{ github.repository }}\"\n" > Dockerfile.label
+          
+          # Build labeled image with latest and version tags
+          docker build -f Dockerfile.label -t $LOWER_REPO:latest -t $LOWER_REPO:${{ steps.version.outputs.VERSION }} .
+          
+          # Push both tags
           docker push $LOWER_REPO:latest
+          docker push $LOWER_REPO:${{ steps.version.outputs.VERSION }}
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "dns-proxy-server-aarch64-${{ steps.version.outputs.VERSION }}" \
+            --title "Release dns-proxy-server-aarch64-${{ steps.version.outputs.VERSION }}" \
+            --notes "Mageddo DPS aarch64 release at version ${{ steps.version.outputs.VERSION }}"

@@ -81,12 +81,24 @@ jobs:
       matrix:
         project: ${{ fromJSON(needs.setup-matrix.outputs.matrix) }}
     runs-on: ${{ fromJSON(needs.setup-matrix.outputs.runner) }}
+    permissions:
+      contents: write
+      packages: write
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.SYNC_TOKEN }}
+
+    - name: Generate Version Number
+      id: version
+      run: |
+        if [ "${{ matrix.project.name }}" = "dummy" ]; then
+          echo "VERSION=dummy" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+        echo "VERSION=$(date +'%Y.%m.%d.%H%M')" >> $GITHUB_OUTPUT
 
     - name: Pre-Flight Validation
       run: |
@@ -233,8 +245,18 @@ jobs:
           docker buildx build --platform "$PLATFORMS" \
             --cache-from type=local,src=${CACHE_BASE}/docker-cache/${{ matrix.project.name }} \
             --cache-to type=local,dest=${CACHE_BASE}/docker-cache/${{ matrix.project.name }},mode=max \
-            -f "$DIR/$DOCKERFILE" -t "$IMAGE_NAME:latest" --push "$DIR"
+            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            -f "$DIR/$DOCKERFILE" -t "$IMAGE_NAME:latest" -t "$IMAGE_NAME:${{ steps.version.outputs.VERSION }}" --push "$DIR"
         fi
+
+    - name: Create GitHub Release
+      if: matrix.project.name != 'dummy'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "${{ matrix.project.name }}-${{ steps.version.outputs.VERSION }}" \
+          --title "Release ${{ matrix.project.name }}-${{ steps.version.outputs.VERSION }}" \
+          --notes "Container build release for ${{ matrix.project.name }} at version ${{ steps.version.outputs.VERSION }}"
 
     - name: Cleanup NFS and Cloudflare Tunnel
       if: always() && !contains(needs.setup-matrix.outputs.runner, 'self-hosted')
