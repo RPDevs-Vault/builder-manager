@@ -17,7 +17,7 @@ jobs:
   build-and-scan:
     name: Build & Scan Base Images
     runs-on:
-      group: linux-builders
+      group: llmadmin01
       labels: [self-hosted, linux, t430]
     permissions:
       contents: write

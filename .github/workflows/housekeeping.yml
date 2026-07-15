@@ -13,9 +13,9 @@ jobs:
     name: Runner Maintenance (${{ matrix.target_node }})
     strategy:
       matrix:
-        target_node: [t430, llmadmin01]
+        target_node: [T430, llmadmin01]
     runs-on:
-      group: linux-builders
+      group: ${{ matrix.target_node }}
       labels: [self-hosted, linux, "${{ matrix.target_node }}"]
     steps:
     - name: Prune Local Docker Daemons

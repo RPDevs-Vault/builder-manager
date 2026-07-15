@@ -12,7 +12,7 @@ jobs:
   generate-dashboard:
     name: Generate Cache Metrics
     runs-on:
-      group: linux-builders
+      group: llmadmin01
       labels: [self-hosted, linux, t430]
     permissions:
       issues: write

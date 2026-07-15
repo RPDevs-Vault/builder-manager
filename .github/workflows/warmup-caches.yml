@@ -12,7 +12,7 @@ env:
 jobs:
   warmup-npm:
     runs-on:
-      group: linux-builders
+      group: llmadmin01
       labels: [self-hosted, linux, t430]
     steps:
     - name: Cache Check
@@ -29,7 +29,7 @@ jobs:
 
   warmup-go:
     runs-on:
-      group: linux-builders
+      group: llmadmin01
       labels: [self-hosted, linux, t430]
     steps:
     - name: Cache Check
@@ -46,7 +46,7 @@ jobs:
 
   warmup-rust:
     runs-on:
-      group: linux-builders
+      group: llmadmin01
       labels: [self-hosted, linux, t430]
     steps:
     - name: Cache Check
@@ -60,7 +60,7 @@ jobs:
 
   warmup-python:
     runs-on:
-      group: linux-builders
+      group: llmadmin01
       labels: [self-hosted, linux, t430]
     steps:
     - name: Cache Check
