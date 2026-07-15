@@ -89,3 +89,10 @@ jobs:
         if [ -f discovery_report.md ]; then
           gh issue create --repo RPDevs-Vault/builder-manager --title "Weekly Docker Asset Collection Summary" --body-file discovery_report.md --label "enhancement"
         fi
+
+    - name: Cache Report Locally
+      run: |
+        if [ -f discovery_report.md ]; then
+          mkdir -p /home/runner/reports
+          cp discovery_report.md /home/runner/reports/
+        fi

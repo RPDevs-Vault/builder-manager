@@ -51,14 +51,14 @@ jobs:
           AVG=$((TOTAL_DURATION / COUNT))
           if [ $AVG -gt 900 ]; then
              echo "Average duration > 15m. Escalating to heavy lifter."
-             echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"linux\",\"heavy\"]}" >> $GITHUB_OUTPUT
+             echo "runner={\"group\":\"llmadmin01\",\"labels\":[\"self-hosted\",\"linux\",\"heavy\"]}" >> $GITHUB_OUTPUT
           else
              echo "Average duration <= 15m. Routing to lite node."
-             echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"linux\",\"lite\"]}" >> $GITHUB_OUTPUT
+             echo "runner={\"group\":\"T430\",\"labels\":[\"self-hosted\",\"linux\",\"lite\"]}" >> $GITHUB_OUTPUT
           fi
         else
           echo "No historical data. Defaulting to lite node."
-          echo "runner={\"group\":\"linux-builders\",\"labels\":[\"self-hosted\",\"linux\",\"lite\"]}" >> $GITHUB_OUTPUT
+          echo "runner={\"group\":\"T430\",\"labels\":[\"self-hosted\",\"linux\",\"lite\"]}" >> $GITHUB_OUTPUT
         fi
 
     - id: set-matrix

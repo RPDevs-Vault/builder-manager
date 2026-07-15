@@ -108,3 +108,10 @@ jobs:
             --repo ${{ github.repository }} \
             --body-file dashboard.md
         fi
+
+    - name: Cache Report Locally
+      run: |
+        if [ -f dashboard.md ]; then
+          mkdir -p /home/runner/reports
+          cp dashboard.md /home/runner/reports/cache_analytics.md
+        fi

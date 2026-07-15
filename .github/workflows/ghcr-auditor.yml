@@ -38,3 +38,10 @@ jobs:
         done
 
         gh issue create --repo RPDevs-Vault/container-manager --title "Weekly GHCR Audit Report" --body-file $REPORT --label "maintenance"
+
+    - name: Cache Report Locally
+      run: |
+        if [ -f ghcr_audit_report.md ]; then
+          mkdir -p /home/runner/reports
+          cp ghcr_audit_report.md /home/runner/reports/
+        fi
