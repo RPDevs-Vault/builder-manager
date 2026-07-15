@@ -39,15 +39,15 @@ jobs:
         - platform: osx64
           host_triplet: x86_64-apple-darwin
           arch_name: osx64
-          runner: '{"group": "macos-builders", "labels": ["macos-latest"]}'
+          runner: '{"group": "llmadmin01", "labels": ["self-hosted", "linux", "heavy"]}'
         - platform: ios
           host_triplet: aarch64-apple-darwin
           arch_name: ios
-          runner: '{"group": "macos-builders", "labels": ["macos-latest"]}'
+          runner: '{"group": "llmadmin01", "labels": ["self-hosted", "linux", "heavy"]}'
         - platform: tvos
           host_triplet: aarch64-apple-darwin
           arch_name: tvos
-          runner: '{"group": "macos-builders", "labels": ["macos-latest"]}'
+          runner: '{"group": "llmadmin01", "labels": ["self-hosted", "linux", "heavy"]}'
         - platform: win64
           host_triplet: x86_64-w64-mingw32
           arch_name: win64
@@ -57,15 +57,11 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Setup Build Environment (Linux/Android)
-      if: matrix.platform == 'linux' || matrix.platform == 'android'
+    - name: Setup Build Environment (Unix)
+      if: matrix.platform != 'win64'
       run: |
         sudo apt-get update || true
-        sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre ccache || true
-
-    - name: Setup Build Environment (macOS/iOS/tvOS)
-      if: matrix.platform == 'osx64' || matrix.platform == 'ios' || matrix.platform == 'tvos'
-      run: brew install cmake ninja nasm gettext coreutils groff ccache
+        sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre ccache nasm gettext || true
 
     - name: Set Universal Cache Path
       id: cache-path
