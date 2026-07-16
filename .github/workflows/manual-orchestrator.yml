@@ -1,0 +1,52 @@
+name: Manual Orchestrator
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_dependency_engine:
+        description: 'Trigger Dependency Engine'
+        type: boolean
+        required: true
+        default: false
+      run_cache_analytics:
+        description: 'Trigger Cache Analytics'
+        type: boolean
+        required: true
+        default: false
+      run_warmup_caches:
+        description: 'Trigger Warm Up Caches'
+        type: boolean
+        required: true
+        default: false
+      kodi_branch:
+        description: 'Kodi branch to build (if triggering Dependency Engine)'
+        required: false
+        default: 'master'
+        type: choice
+        options: [master, Piers, Omega]
+
+jobs:
+  trigger-workflows:
+    name: Orchestrate Workflows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Dependency Engine
+        if: ${{ inputs.run_dependency_engine }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run dependency-engine.yml -f kodi_branch="${{ inputs.kodi_branch }}"
+
+      - name: Trigger Cache Analytics
+        if: ${{ inputs.run_cache_analytics }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run cache-analytics.yml
+
+      - name: Trigger Warm Up Caches
+        if: ${{ inputs.run_warmup_caches }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh workflow run warmup-caches.yml

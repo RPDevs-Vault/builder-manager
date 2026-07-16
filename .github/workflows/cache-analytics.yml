@@ -112,6 +112,6 @@ jobs:
     - name: Cache Report Locally
       run: |
         if [ -f dashboard.md ]; then
-          mkdir -p /home/runner/reports
-          cp dashboard.md /home/runner/reports/cache_analytics.md
+          mkdir -p /mnt/sharedroot/github_runners/reports
+          cp dashboard.md /mnt/sharedroot/github_runners/reports/cache_analytics.md
         fi

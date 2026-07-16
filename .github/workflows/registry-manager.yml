@@ -1,0 +1,390 @@
+name: Registry Management Engine
+
+defaults:
+  run:
+    working-directory: container
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'   # GHCR Auditor (Weekly Mon 00:00)
+    - cron: '0 13 * * 0'  # Stale Cleanup (Weekly Sun 13:00)
+    - cron: '0 2 * * 0'   # Scan Dependencies (Weekly Sun 02:00)
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Engine action to run'
+        required: true
+        default: 'all'
+        type: choice
+        options: [all, collect-docker-assets, audit-ghcr, cleanup-stale, scan-dependencies, mirror-oci, build-dependencies]
+      image:
+        description: '[Mirror] Upstream image to mirror (e.g. library/alpine:latest)'
+        required: false
+      target_name:
+        description: '[Mirror] Name in our GHCR (defaults to upstream name)'
+        required: false
+      kodi_branch:
+        description: '[Build] Kodi branch to build'
+        required: false
+        default: 'master'
+        type: choice
+        options: [master, Piers, Omega]
+  repository_dispatch:
+    types: [collect_docker_assets]
+  push:
+    paths:
+      - 'container/dependencies/**'
+
+jobs:
+  collect-docker-assets:
+    name: Collect Docker Assets
+    if: github.event_name == 'repository_dispatch' || github.event.inputs.action == 'all' || github.event.inputs.action == 'collect-docker-assets'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Scan and Collect Assets
+      env:
+        GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+      run: |
+        echo "### 🚢 Docker Asset Discovery Report" > discovery_report.md
+        echo "Scanning and collecting Docker assets..." >> discovery_report.md
+        echo "| Repository | Type | Action Taken |" >> discovery_report.md
+        echo "| :--- | :--- | :--- |" >> discovery_report.md
+
+        EXCLUDED_FILE="exclusion_list.md"
+        REPOS_USER=$(gh repo list IamRPDev --limit 1000 --json nameWithOwner,isArchived --jq '.[] | select(.isArchived == false) | .nameWithOwner')
+        REPOS_ORG=$(gh repo list RPDevs-Vault --limit 1000 --json nameWithOwner,isArchived --jq '.[] | select(.isArchived == false) | .nameWithOwner')
+        REPOS="$REPOS_USER $REPOS_ORG"
+
+        for repo in $REPOS; do
+          if [ -f "$EXCLUDED_FILE" ] && grep -q "$repo" "$EXCLUDED_FILE"; then
+            continue
+          fi
+
+          REPO_CLEAN=$(echo "$repo" | sed 's/\//_/g')
+          TARGET_DIR="containers/$REPO_CLEAN"
+          FILES=$(gh api "/repos/$repo/contents" --jq '.[] | select(.name == "Dockerfile" or .name == "docker-compose.yml" or .name == "compose.yaml" or .name == "compose.yml") | .name' 2>/dev/null || true)
+          
+          if [[ -n "$FILES" ]]; then
+            mkdir -p "$TARGET_DIR"
+            for file in $FILES; do
+              CONTENT=$(gh api "/repos/$repo/contents/$file" --jq '.content' | base64 -d 2>/dev/null || true)
+              
+              if [[ "$file" == "Dockerfile" ]]; then
+                echo "$CONTENT" > "$TARGET_DIR/Dockerfile"
+                IMAGE_NAME="ghcr.io/rpdevs-vault/${REPO_CLEAN,,}"
+                echo "docker run -d --name $REPO_CLEAN $IMAGE_NAME:latest" > "$TARGET_DIR/command.txt"
+                echo "| \`$repo\` | Dockerfile | Archived to \`$TARGET_DIR/Dockerfile\` |" >> discovery_report.md
+              fi
+              
+              if [[ "$file" == *"compose"* ]]; then
+                echo "$CONTENT" > "$TARGET_DIR/$file"
+                echo "| \`$repo\` | Compose | Archived to \`$TARGET_DIR/\` |" >> discovery_report.md
+              fi
+            done
+
+            IMAGE_NAME="ghcr.io/rpdevs-vault/${REPO_CLEAN,,}"
+            echo "# 📦 $REPO_CLEAN" > "$TARGET_DIR/README.md"
+            echo "- **Source Repo:** [\`$repo\`](https://github.com/$repo)" >> "$TARGET_DIR/README.md"
+            echo "- **Image:** \`$IMAGE_NAME:latest\`" >> "$TARGET_DIR/README.md"
+            echo "- **Command:** See [\`command.txt\`](./command.txt)" >> "$TARGET_DIR/README.md"
+          fi
+        done
+
+        # Git config with explicitly disabled GPG signing for the bot
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git config commit.gpgsign false
+
+        git add containers/ images/ exclusion_list.md
+        git rm -rf build/*/ 2>/dev/null || true
+
+        if ! git diff --staged --quiet; then
+          git commit -m "feat: archive discovered Docker assets"
+          git pull --rebase origin main || (git rebase --abort && git pull origin main --no-rebase)
+          git push origin main
+        fi
+
+        if [ -f discovery_report.md ]; then
+          gh issue create --repo RPDevs-Vault/builder-manager --title "Weekly Docker Asset Collection Summary" --body-file discovery_report.md --label "enhancement"
+        fi
+
+    - name: Cache Report Locally
+      run: |
+        if [ -f discovery_report.md ]; then
+          mkdir -p /home/runner/reports
+          cp discovery_report.md /home/runner/reports/
+        fi
+
+  audit-ghcr:
+    name: Audit Organization Packages
+    if: github.event_name == 'schedule' || github.event.inputs.action == 'all' || github.event.inputs.action == 'audit-ghcr'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Audit GHCR
+      env:
+        GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+      run: |
+        PACKAGES=$(gh api /orgs/RPDevs-Vault/packages?package_type=container --paginate)
+
+        if [[ $(echo "$PACKAGES" | jq 'length') -eq 0 ]]; then
+          echo "No container packages found in the organization registry. ✅"
+          exit 0
+        fi
+
+        REPORT="ghcr_audit_report.md"
+        echo "## 📦 GHCR Package Audit - $(date)" > $REPORT
+        echo "| Package Name | Visibility | Versions | Last Updated |" >> $REPORT
+        echo "| :--- | :--- | :--- | :--- |" >> $REPORT
+
+        echo "$PACKAGES" | jq -c '.[]' | while read -r pkg; do
+          NAME=$(echo "$pkg" | jq -r '.name')
+          VISIBILITY=$(echo "$pkg" | jq -r '.visibility')
+          UPDATED=$(echo "$pkg" | jq -r '.updated_at')
+          VERSIONS=$(gh api "/orgs/RPDevs-Vault/packages/container/$NAME/versions" --jq 'length')
+          echo "| \`$NAME\` | $VISIBILITY | $VERSIONS | $UPDATED |" >> $REPORT
+        done
+
+        gh issue create --repo RPDevs-Vault/container-manager --title "Weekly GHCR Audit Report" --body-file $REPORT --label "maintenance"
+
+    - name: Cache Report Locally
+      run: |
+        if [ -f ghcr_audit_report.md ]; then
+          mkdir -p /home/runner/reports
+          cp ghcr_audit_report.md /home/runner/reports/
+        fi
+
+  cleanup-stale:
+    name: Prune Stale Packages
+    if: github.event_name == 'schedule' || github.event.inputs.action == 'all' || github.event.inputs.action == 'cleanup-stale'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Clean GHCR
+      env:
+        GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+      run: |
+        PACKAGES=$(gh api /orgs/RPDevs-Vault/packages?package_type=container --paginate --jq '.[].name')
+        NOW=$(date +%s)
+        NINETY_DAYS=7776000
+
+        for pkg in $PACKAGES; do
+          echo "Cleaning up $pkg..."
+          VERSIONS=$(gh api "/orgs/RPDevs-Vault/packages/container/$pkg/versions" --paginate)
+          
+          echo "$VERSIONS" | jq -c '.[]' | while read -r ver; do
+            ID=$(echo "$ver" | jq -r '.id')
+            TAGS=$(echo "$ver" | jq -r '.metadata.container.tags | length')
+            UPDATED=$(echo "$ver" | jq -r '.updated_at')
+            UPDATED_SEC=$(date -d "$UPDATED" +%s)
+            DIFF=$((NOW - UPDATED_SEC))
+            DELETE=false
+            REASON=""
+
+            if [[ $TAGS -eq 0 ]]; then
+              DELETE=true
+              REASON="Untagged image"
+            fi
+
+            if [[ $DIFF -gt $NINETY_DAYS ]]; then
+              DELETE=true
+              REASON="Older than 90 days (Last update: $UPDATED)"
+            fi
+
+            if [[ "$DELETE" == "true" ]]; then
+              echo "Deleting version $ID of $pkg: $REASON"
+              gh api -X DELETE "/orgs/RPDevs-Vault/packages/container/$pkg/versions/$ID" --silent || echo "Failed to delete $ID"
+            fi
+          done
+        done
+
+  scan-dependencies:
+    name: Scan Dependencies
+    if: github.event_name == 'schedule' || github.event.inputs.action == 'all' || github.event.inputs.action == 'scan-dependencies'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Run Dependency Scanner
+      env:
+        GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: python dependency/scan_dependencies.py
+
+    - name: Commit and Push Changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global commit.gpgsign false
+        
+        if git status --porcelain | grep -q "dependency_registry.json"; then
+          git add dependency_registry.json
+          git commit -m "chore: auto-update dependency registry [skip ci]"
+          git pull origin main --rebase
+          git push origin main
+          echo "✅ Registry updated and pushed successfully."
+        else
+          echo "No changes in dependency registry. Skipping push."
+        fi
+
+  mirror-oci:
+    name: OCI Mirroring
+    if: github.event.inputs.action == 'mirror-oci'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Login to GHCR
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.SYNC_TOKEN }}
+
+    - name: Pull, Tag, and Push
+      run: |
+        IMAGE="${{ github.event.inputs.image }}"
+        TAG_NAME="${{ github.event.inputs.target_name }}"
+
+        if [ -z "$IMAGE" ]; then
+          echo "Error: Image to mirror is required for mirror-oci action."
+          exit 1
+        fi
+
+        if [ -z "$TAG_NAME" ]; then
+          CLEAN_IMAGE="${IMAGE%%@*}"
+          BASENAME="${CLEAN_IMAGE##*/}"
+          TAG_NAME="${BASENAME%%:*}"
+        fi
+
+        TARGET="ghcr.io/rpdevs-vault/$TAG_NAME:latest"
+
+        echo "Mirroring $IMAGE to $TARGET..."
+        docker pull "$IMAGE"
+        docker tag "$IMAGE" "$TARGET"
+        docker push "$TARGET"
+
+  build-dependencies:
+    name: Build Dependencies (${{ matrix.platform }})
+    if: github.event_name == 'push' || github.event.inputs.action == 'all' || github.event.inputs.action == 'build-dependencies'
+    runs-on: ${{ fromJSON(matrix.runner) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - platform: linux
+          host_triplet: x86_64-linux-gnu
+          arch_name: linux-x86_64
+          runner: '{"group": "llmadmin01", "labels": ["self-hosted", "linux", "heavy"]}'
+        - platform: linux
+          host_triplet: aarch64-linux-gnu
+          arch_name: linux-arm64
+          runner: '{"group": "llmadmin01", "labels": ["self-hosted", "linux", "heavy"]}'
+        - platform: android
+          host_triplet: aarch64-linux-android
+          arch_name: android-arm64
+          runner: '{"group": "llmadmin01", "labels": ["self-hosted", "linux", "heavy"]}'
+        - platform: osx64
+          host_triplet: x86_64-apple-darwin
+          arch_name: osx64
+          runner: '{"group": "llmadmin01", "labels": ["self-hosted", "linux", "heavy"]}'
+        - platform: ios
+          host_triplet: aarch64-apple-darwin
+          arch_name: ios
+          runner: '{"group": "llmadmin01", "labels": ["self-hosted", "linux", "heavy"]}'
+        - platform: tvos
+          host_triplet: aarch64-apple-darwin
+          arch_name: tvos
+          runner: '{"group": "llmadmin01", "labels": ["self-hosted", "linux", "heavy"]}'
+        - platform: win64
+          host_triplet: x86_64-w64-mingw32
+          arch_name: win64
+          runner: '{"group": "llmadmin01", "labels": ["self-hosted", "linux", "heavy"]}'
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Setup Build Environment (Unix)
+      run: |
+        sudo apt-get update || true
+        sudo apt-get install -y build-essential curl git unzip zip cmake autoconf automake libtool pkg-config gperf default-jre ccache nasm gettext mingw-w64 || true
+
+    - name: Set Universal Cache Path
+      id: cache-path
+      run: |
+        # Strictly POSIX compliant evaluation
+        if [ "${{ contains(matrix.runner, 'self-hosted') }}" = "true" ]; then
+          echo "CACHE_BASE=/mnt/sharedroot/github_runners/shared" >> $GITHUB_ENV
+        else
+          echo "CACHE_BASE=/mnt/shared" >> $GITHUB_ENV
+        fi
+
+    - name: Build Dependencies (Unix)
+      id: build_step
+      run: |
+        export CCACHE_DIR=$CACHE_BASE/ccache
+        mkdir -p $CCACHE_DIR
+        
+        # 🚀 MULTITHREADING ACTIVATED: Dynamically detect Linux or macOS cores
+        CORES=$(nproc 2>/dev/null || sysctl -n hw.ncpu)
+        export MAKEFLAGS="-j$CORES"
+        export NINJAJOBS="$CORES"
+        
+        chmod +x dependencies/kodi/build.sh
+        cd dependencies/kodi
+        BRANCH="${{ github.event.inputs.kodi_branch || 'master' }}"
+        
+        echo "Building on $CORES CPU threads with ccache pointed to $CCACHE_DIR"
+        ./build.sh ${{ matrix.platform }} ${{ matrix.host_triplet }} "$BRANCH" > build.log 2>&1 || {
+          echo "::error::Build failed. Last 100 lines:"
+          tail -n 100 build.log
+          exit 1
+        }
+        tail -n 50 build.log
+
+    - name: Upload Build Log on Failure
+      if: failure() && steps.build_step.outcome == 'failure'
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-log-${{ matrix.arch_name }}
+        path: container/dependencies/kodi/build.log
+
+    - name: Package Toolchain
+      run: |
+        cd dependencies/kodi/compiled-artifacts
+        tar -czvf ../../../kodi-dependencies-${{ matrix.arch_name }}.tar.gz .
+        
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: kodi-dependencies-${{ matrix.arch_name }}
+        path: container/kodi-dependencies-${{ matrix.arch_name }}.tar.gz
+        retention-days: 14
+
+  dispatch-to-distributor:
+    name: Dispatch to Distributor
+    needs: build-dependencies
+    if: (github.event_name == 'push' || github.event.inputs.action == 'all' || github.event.inputs.action == 'build-dependencies') && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Emit Repository Dispatch
+      env:
+        GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
+      run: |
+        gh api -X POST /repos/RPDevs-Vault/delivery-manager/dispatches \
+          -f event_type='publish_artifact' \
+          -f client_payload[run_id]="${{ github.run_id }}" \
+          -f client_payload[project]="kodi-dependencies"
