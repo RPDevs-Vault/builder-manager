@@ -37,12 +37,8 @@ All automated processes are executed via GitHub Action workflows located in `.gi
 | :--- | :--- | :--- |
 | **`base-image-builder.yml`** | Manual or push to `/container/runners/**` | Compiles and publishes the specialized base runner images (`runner-multiarch-builder`) used by our self-hosted runner fleets. |
 | **`build-engine.yml`** | Repository Dispatch (`collect_docker_assets`) | Automatically compiles individual OCI images defined under `/container/containers/` and publishes them to GitHub Container Registry (GHCR). |
-| **`build-depends.yml`** | Weekly or Manual | Compiles and packages heavy dependency binaries (e.g. Kodi libraries) and archives them as GitHub releases. |
-| **`scan-dependencies.yml`** | Weekly or Manual | Runs the Python scanner script across the orgs, updating the `dependency_registry.json` database. |
 | **`warmup-caches.yml`** | Weekly or Manual | Triggers weekly jobs on self-hosted runners to warm up package cache volumes for **NPM**, **Go**, **Cargo**, and **Python Pip/Poetry**. |
-| **`docker-collector.yml`** | Repository Dispatch | Scrapes docker compose configurations and updates references across targets. |
-| **`ghcr-auditor.yml`** | Scheduled / Weekly | Queries and validates published GHCR packages for tag health and build consistency. |
-| **`stale-package-cleanup.yml`** | Scheduled / Monthly | Deletes untagged, orphaned, or stale image versions from GHCR to save storage space. |
+| **`registry-manager.yml`** | Scheduled, Dispatch, or Push | A unified engine that handles dependency compilation, organization dependency scanning, GHCR auditing, OCI image mirroring, stale package pruning, and docker asset collection. |
 
 ---
 
