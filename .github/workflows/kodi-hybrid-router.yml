@@ -29,34 +29,43 @@ jobs:
         run: |
           PLATFORM="${{ inputs.platform }}"
           
-          # OS Targeting Convention
+          # OS Targeting Convention & Matrix Distribution
           case "$PLATFORM" in
-            android* | linux*)
+            android*)
               echo "runner_group=Linux-Builders" >> $GITHUB_OUTPUT
               echo "os_label=linux64" >> $GITHUB_OUTPUT
               echo "hosted_runner=ubuntu-latest" >> $GITHUB_OUTPUT
+              # T430 Multiarch for specialized local cross-compilation
+              echo "tier=medium" >> $GITHUB_OUTPUT 
+              ;;
+            linux*)
+              echo "runner_group=Linux-Builders" >> $GITHUB_OUTPUT
+              echo "os_label=linux64" >> $GITHUB_OUTPUT
+              echo "hosted_runner=ubuntu-latest" >> $GITHUB_OUTPUT
+              # GitHub Hosted for general builds
+              echo "tier=hosted" >> $GITHUB_OUTPUT 
               ;;
             osx* | ios* | tvos*)
               echo "runner_group=macOS-Builders" >> $GITHUB_OUTPUT
               echo "os_label=macos" >> $GITHUB_OUTPUT
               echo "hosted_runner=macos-latest" >> $GITHUB_OUTPUT
+              # GitHub Hosted for general Apple builds
+              echo "tier=hosted" >> $GITHUB_OUTPUT 
               ;;
             windows*)
               echo "runner_group=Windows-Builders" >> $GITHUB_OUTPUT
               echo "os_label=windows" >> $GITHUB_OUTPUT
               echo "hosted_runner=windows-latest" >> $GITHUB_OUTPUT
+              # llmadmin01 Multiarch for heavy lifting
+              echo "tier=heavy" >> $GITHUB_OUTPUT 
               ;;
             *)
               echo "runner_group=Linux-Builders" >> $GITHUB_OUTPUT
               echo "os_label=linux64" >> $GITHUB_OUTPUT
               echo "hosted_runner=ubuntu-latest" >> $GITHUB_OUTPUT
+              echo "tier=hosted" >> $GITHUB_OUTPUT
               ;;
           esac
-
-          # Calculate historical duration for tier escalation
-          # For demonstration/pilot, we will default to 'hosted' to allow the timeout fallback cascade.
-          echo "tier=hosted" >> $GITHUB_OUTPUT
-
   try-hosted:
     needs: determine-tier
     if: needs.determine-tier.outputs.start_tier == 'hosted'
