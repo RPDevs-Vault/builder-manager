@@ -24,6 +24,8 @@ runs:
     - name: Install macOS Dependencies
       if: ${{ inputs.platform == 'osx64' }}
       shell: bash
+      env:
+        HOMEBREW_NO_REQUIRE_TAP_TRUST: 1
       run: brew install cmake ninja nasm gettext coreutils groff
 
     - name: Build Depends
