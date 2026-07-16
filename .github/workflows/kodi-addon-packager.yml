@@ -1,0 +1,153 @@
+name: Build and Dispatch Kodi Addons
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Run daily at 2:00 AM UTC
+  workflow_dispatch:
+    inputs:
+      target_repo:
+        description: 'Target repository to package'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - repo-plugins
+          - repo-scrapers
+          - repo-scripts
+      branch_input:
+        description: 'Branch to build'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - both
+          - Piers
+          - Omega
+
+permissions:
+  contents: write
+
+jobs:
+  setup-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - id: set-matrix
+        run: |
+          if [ "${{ github.event_name }}" == "schedule" ]; then
+            REPOS='["repo-plugins", "repo-scrapers", "repo-scripts"]'
+            BRANCHES='["Piers", "Omega"]'
+          else
+            REPO="${{ github.event.inputs.target_repo }}"
+            BRANCH="${{ github.event.inputs.branch_input }}"
+            
+            if [ "$REPO" == "all" ]; then
+              REPOS='["repo-plugins", "repo-scrapers", "repo-scripts"]'
+            else
+              REPOS="[\"$REPO\"]"
+            fi
+            
+            if [ "$BRANCH" == "both" ]; then
+              BRANCHES='["Piers", "Omega"]'
+            else
+              BRANCHES="[\"$BRANCH\"]"
+            fi
+          fi
+          
+          echo "matrix={\"target_repo\": $REPOS, \"branch\": $BRANCHES, \"platform\": [\"linux64\", \"win64\", \"android-arm64\", \"osx64\"]}" >> $GITHUB_OUTPUT
+
+  build:
+    needs: [setup-matrix]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.setup-matrix.outputs.matrix) }}
+    name: Package ${{ matrix.target_repo }} (${{ matrix.branch }}) on ${{ matrix.platform }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          repository: xbmc/${{ matrix.target_repo }}
+          ref: ${{ matrix.branch == 'Piers' && (matrix.target_repo == 'inputstream.ffmpegdirect' || matrix.target_repo == 'inputstream.adaptive') && 'Piers' || (matrix.branch == 'Piers' && 'master' || 'Omega') }}
+          path: source/${{ matrix.target_repo }}
+          fetch-depth: 1
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y zip unzip gawk
+
+      - name: Package Python/XML Addon
+        run: |
+          TARGET_DIR="source/${{ matrix.target_repo }}"
+          
+          # Check for version.txt, fallback to parsing addon.xml, then fallback to date
+          if [ -f "$TARGET_DIR/version.txt" ]; then
+            VERSION=$(grep "VERSION_CODE" "$TARGET_DIR/version.txt" | awk '{print $2}')
+          elif [ -f "$TARGET_DIR/addon.xml" ]; then
+            VERSION=$(grep -oP '(?<=version=")[^"]*' "$TARGET_DIR/addon.xml" | head -1)
+          fi
+          
+          if [ -z "$VERSION" ]; then
+            VERSION="v-$(date +'%Y%m%d')"
+          fi
+          
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          
+          # Rolling Tag logic - appending date for multi-version archiving
+          ROLLING_DATE=$(date +'%Y%m%d')
+          echo "ROLLING_DATE=$ROLLING_DATE" >> $GITHUB_ENV
+          
+          # Target Directory
+          OUT_DIR="compiled/${{ matrix.platform }}/$VERSION"
+          mkdir -p "$OUT_DIR"
+          echo "OUT_DIR=$OUT_DIR" >> $GITHUB_ENV
+
+          echo "📦 Packaging Python/XML Addon..."
+          cp -rv $TARGET_DIR/* "$OUT_DIR/"
+          touch "$OUT_DIR/.kodi_build_marker"
+
+      - name: Create Archive
+        run: |
+          # Use rolling versioning for tag, but preserve package version in filename
+          TAG="rolling-${{ matrix.target_repo }}-${{ matrix.branch }}-${{ env.ROLLING_DATE }}"
+          echo "TAG=$TAG" >> $GITHUB_ENV
+          FILENAME="${{ matrix.target_repo }}-${{ matrix.platform }}-${{ env.VERSION }}-${{ matrix.branch }}"
+          
+          if [ "${{ matrix.platform }}" == "linux64" ]; then
+            tar -czf "$FILENAME.tar.gz" -C "$OUT_DIR" .
+            echo "FILE=$FILENAME.tar.gz" >> $GITHUB_ENV
+          else
+            cd "$OUT_DIR" && zip -r "../../$FILENAME.zip" .
+            cd ../../..
+            echo "FILE=$FILENAME.zip" >> $GITHUB_ENV
+          fi
+
+      - name: Dispatch / Release
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GH_PAT }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "GH_TOKEN or GH_PAT secret not found. Skipping release step."
+            exit 0
+          fi
+          
+          # Release notes preserving the presumed package version
+          RELEASE_NOTES="Automated rolling build for ${{ matrix.platform }}.
+          
+          **Target Repo:** ${{ matrix.target_repo }}
+          **Branch:** ${{ matrix.branch }}
+          **Presumed Package Version:** ${{ env.VERSION }}
+          
+          _Compiled for multi-version archiving and rollback._"
+          
+          gh release create "$TAG" $FILE \
+            --title "${{ matrix.target_repo }} ${{ matrix.branch }} - Rolling ${{ env.ROLLING_DATE }}" \
+            --notes "$RELEASE_NOTES" \
+            --prerelease || \
+          gh release upload "$TAG" $FILE --clobber
