@@ -39,6 +39,9 @@ All automated processes are executed via GitHub Action workflows located in `.gi
 | **`build-engine.yml`** | Repository Dispatch (`collect_docker_assets`) | Automatically compiles individual OCI images defined under `/container/containers/` and publishes them to GitHub Container Registry (GHCR). |
 | **`warmup-caches.yml`** | Weekly or Manual | Triggers weekly jobs on self-hosted runners to warm up package cache volumes for **NPM**, **Go**, **Cargo**, and **Python Pip/Poetry**. |
 | **`registry-manager.yml`** | Scheduled, Dispatch, or Push | A unified engine that handles dependency compilation, organization dependency scanning, GHCR auditing, OCI image mirroring, stale package pruning, and docker asset collection. |
+| **`kodi-build-release.yml`** | Manual, Push, Pull Request | Compiles and packages Kodi release builds for Linux, Windows, and Android, utilizing high-speed NFS caching via Cloudflare Tunnel. |
+| **`kodi-build-depends.yml`** | Manual, Schedule | Compiles and packages Kodi build dependencies (e.g., for macOS and Android) and publishes them as GitHub releases. |
+| **`kodi-hybrid-router.yml`** | Workflow Call | Reusable routing workflow to dynamically determine the optimal runner tier for Kodi builds (hosted vs self-hosted). |
 
 ---
 

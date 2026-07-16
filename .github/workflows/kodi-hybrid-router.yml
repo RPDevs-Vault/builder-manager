@@ -1,0 +1,98 @@
+name: Hybrid Router
+
+on:
+  workflow_call:
+    inputs:
+      platform:
+        required: true
+        type: string
+      branch:
+        required: true
+        type: string
+    secrets:
+      GH_TOKEN:
+        required: true
+
+jobs:
+  determine-tier:
+    runs-on: ubuntu-latest
+    outputs:
+      start_tier: ${{ steps.calc.outputs.tier }}
+      runner_group: ${{ steps.calc.outputs.runner_group }}
+      os_label: ${{ steps.calc.outputs.os_label }}
+      hosted_runner: ${{ steps.calc.outputs.hosted_runner }}
+    steps:
+      - name: Calculate OS Targets and Escalation Tier
+        id: calc
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          PLATFORM="${{ inputs.platform }}"
+          
+          # OS Targeting Convention
+          case "$PLATFORM" in
+            android* | linux*)
+              echo "runner_group=Linux-Builders" >> $GITHUB_OUTPUT
+              echo "os_label=linux64" >> $GITHUB_OUTPUT
+              echo "hosted_runner=ubuntu-latest" >> $GITHUB_OUTPUT
+              ;;
+            osx* | ios* | tvos*)
+              echo "runner_group=macOS-Builders" >> $GITHUB_OUTPUT
+              echo "os_label=macos" >> $GITHUB_OUTPUT
+              echo "hosted_runner=macos-latest" >> $GITHUB_OUTPUT
+              ;;
+            windows*)
+              echo "runner_group=Windows-Builders" >> $GITHUB_OUTPUT
+              echo "os_label=windows" >> $GITHUB_OUTPUT
+              echo "hosted_runner=windows-latest" >> $GITHUB_OUTPUT
+              ;;
+            *)
+              echo "runner_group=Linux-Builders" >> $GITHUB_OUTPUT
+              echo "os_label=linux64" >> $GITHUB_OUTPUT
+              echo "hosted_runner=ubuntu-latest" >> $GITHUB_OUTPUT
+              ;;
+          esac
+
+          # Calculate historical duration for tier escalation
+          # For demonstration/pilot, we will default to 'hosted' to allow the timeout fallback cascade.
+          echo "tier=hosted" >> $GITHUB_OUTPUT
+
+  try-hosted:
+    needs: determine-tier
+    if: needs.determine-tier.outputs.start_tier == 'hosted'
+    runs-on: ${{ needs.determine-tier.outputs.hosted_runner }}
+    timeout-minutes: 15
+    steps:
+      - uses: ./.github/actions/build-depends-payload
+        with:
+          platform: ${{ inputs.platform }}
+          branch: ${{ inputs.branch }}
+          gh_token: ${{ secrets.GH_TOKEN }}
+
+  try-medium:
+    needs: [determine-tier, try-hosted]
+    if: always() && (needs.determine-tier.outputs.start_tier == 'medium' || needs.try-hosted.result == 'failure')
+    runs-on:
+      group: ${{ needs.determine-tier.outputs.runner_group }}
+      labels: [self-hosted, '${{ needs.determine-tier.outputs.os_label }}', medium]
+    timeout-minutes: 15
+    steps:
+      - uses: ./.github/actions/build-depends-payload
+        with:
+          platform: ${{ inputs.platform }}
+          branch: ${{ inputs.branch }}
+          gh_token: ${{ secrets.GH_TOKEN }}
+
+  try-heavy:
+    needs: [determine-tier, try-medium]
+    if: always() && (needs.determine-tier.outputs.start_tier == 'heavy' || needs.try-medium.result == 'failure')
+    runs-on:
+      group: ${{ needs.determine-tier.outputs.runner_group }}
+      labels: [self-hosted, '${{ needs.determine-tier.outputs.os_label }}', heavy]
+    timeout-minutes: 360
+    steps:
+      - uses: ./.github/actions/build-depends-payload
+        with:
+          platform: ${{ inputs.platform }}
+          branch: ${{ inputs.branch }}
+          gh_token: ${{ secrets.GH_TOKEN }}

@@ -1,0 +1,62 @@
+name: "Build Depends Payload"
+description: "Core logic for building and releasing Kodi depends"
+inputs:
+  platform:
+    description: "Target platform"
+    required: true
+  branch:
+    description: "Kodi branch"
+    required: true
+  gh_token:
+    description: "GitHub Token for Releases"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout Kodi
+      uses: actions/checkout@v4
+      with:
+        repository: xbmc/xbmc
+        ref: ${{ inputs.branch == 'Piers' && 'master' || inputs.branch }}
+        path: source/xbmc
+
+    - name: Install macOS Dependencies
+      if: ${{ inputs.platform == 'osx64' }}
+      shell: bash
+      run: brew install cmake ninja nasm gettext coreutils groff
+
+    - name: Build Depends
+      shell: bash
+      run: |
+        mkdir -p xbmc-deps
+        cd source/xbmc/tools/depends
+        ./bootstrap
+        case "${{ inputs.platform }}" in
+          android-arm64) export CONFIG_FLAGS="--host=aarch64-linux-android --with-sdk-path=/opt/android-sdk --with-ndk-path=/opt/android-sdk/ndk/25.2.9519653" ;;
+          osx64) 
+            export CONFIG_FLAGS="--with-platform=macos"
+            export PATH="$(brew --prefix gettext)/bin:$(brew --prefix coreutils)/libexec/gnubin:$PATH"
+            ;;
+        esac
+        ./configure --prefix=${{ github.workspace }}/xbmc-deps $CONFIG_FLAGS
+        make -j$(nproc || sysctl -n hw.ncpu)
+
+    - name: Archive Depends
+      shell: bash
+      run: |
+        tar -czf depends-${{ inputs.platform }}.tar.gz -C xbmc-deps .
+
+    - name: Release
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.gh_token }}
+      run: |
+        BRANCH="${{ inputs.branch }}"
+        TAG="depends-${{ inputs.platform }}-$BRANCH"
+        gh release create "$TAG" depends-${{ inputs.platform }}.tar.gz \
+          --repo "RPDevs-Vault/builder-manager" \
+          --title "Pre-compiled Depends: ${{ inputs.platform }} ($BRANCH)" \
+          --notes "Automated depends build." \
+          --prerelease || \
+        gh release upload "$TAG" depends-${{ inputs.platform }}.tar.gz --repo "RPDevs-Vault/builder-manager" --clobber

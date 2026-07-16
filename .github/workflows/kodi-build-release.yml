@@ -1,0 +1,252 @@
+name: Build and Release Kodi
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build-linux:
+    name: Build Linux (${{ matrix.branch }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ['master', 'Omega']
+    steps:
+      - name: Checkout Kodi Source
+        uses: actions/checkout@v4
+        with:
+          repository: xbmc/xbmc
+          ref: ${{ matrix.branch }}
+          path: kodi-source
+          fetch-depth: 1
+
+      - name: Install Build Dependencies
+        run: |
+          sudo sed -i 's/^Types: deb$/Types: deb deb-src/' /etc/apt/sources.list.d/ubuntu.sources
+          sudo apt update
+          sudo apt build-dep kodi -y
+          sudo apt install -y rpm ruby ruby-dev rubygems build-essential ccache libdisplay-info-dev libpcre3-dev libexiv2-dev libtinyxml2-dev nasm
+          sudo gem install --no-document fpm
+
+      - name: Mount Remote NFS Cache via Cloudflare Tunnel
+        env:
+          CF_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          sudo apt-get update && sudo apt-get install -y nfs-common
+          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+          export TUNNEL_SERVICE_TOKEN_ID=$CF_CLIENT_ID
+          export TUNNEL_SERVICE_TOKEN_SECRET=$CF_CLIENT_SECRET
+          cloudflared access tcp --hostname nfs-sharedroot.iamrp.dev --url 127.0.0.1:2049 &
+          sleep 10
+          sudo mkdir -p /mnt/sharedroot/github_runners/shared
+          sudo mount -t nfs -o port=2049,soft,timeo=100,retrans=2 127.0.0.1:/sharedroot/github_runners/shared /mnt/sharedroot/github_runners/shared
+
+      - name: Setup ccache via NFS
+        run: |
+          mkdir -p /mnt/sharedroot/github_runners/shared/ccache/kodi-${{ matrix.branch }}
+          ln -s /mnt/sharedroot/github_runners/shared/ccache/kodi-${{ matrix.branch }} ~/.ccache
+
+      - name: Cache Linux Build Dependencies via NFS
+        run: |
+          mkdir -p build/build
+          mkdir -p /mnt/sharedroot/github_runners/shared/kodi-depends/${{ matrix.branch }}
+          ln -sf /mnt/sharedroot/github_runners/shared/kodi-depends/${{ matrix.branch }} build/build/download
+
+      - name: Configure CMake
+        run: |
+          mkdir -p build
+          cmake -S kodi-source -B build \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DAPP_RENDER_SYSTEM=gl \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DENABLE_INTERNAL_FFMPEG=ON \
+            -DENABLE_INTERNAL_NLOHMANNJSON=ON
+
+      - name: Build Kodi
+        run: cmake --build build -- -j$(nproc)
+
+      - name: Create Standalone Archive
+        run: |
+          DESTDIR=install_dir cmake --install build
+          tar -czf kodi-linux-${{ matrix.branch }}-standalone.tar.gz -C install_dir .
+
+      - name: Create DEB and RPM Packages
+        run: |
+          mkdir -p pkg_root
+          DESTDIR=$(pwd)/pkg_root cmake --install build
+          VERSION=$(grep "VERSION_CODE" kodi-source/version.txt | awk '{print $2}')
+          fpm -s dir -t deb -n kodi -v "$VERSION" -C pkg_root usr/
+          fpm -s dir -t rpm -n kodi -v "$VERSION" -C pkg_root usr/
+
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-packages-${{ matrix.branch }}
+          path: |
+            *.deb
+            *.rpm
+            *.tar.gz
+
+  build-windows:
+    name: Build Windows (${{ matrix.branch }})
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ['master', 'Omega']
+    steps:
+      - name: Checkout Kodi Source
+        uses: actions/checkout@v4
+        with:
+          repository: xbmc/xbmc
+          ref: ${{ matrix.branch }}
+          path: kodi-source
+          fetch-depth: 1
+
+      - name: Cache Windows Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            kodi-source/project/BuildDependencies/downloads
+            kodi-source/project/BuildDependencies/downloads2
+            kodi-source/project/BuildDependencies/msys64
+            kodi-source/project/BuildDependencies/mingwlibs
+          key: windows-${{ matrix.branch }}-deps-${{ hashFiles('kodi-source/project/BuildDependencies/scripts/get_formed.cmd', 'kodi-source/tools/depends/target/ffmpeg/FFMPEG-VERSION') }}
+          restore-keys: |
+            windows-${{ matrix.branch }}-deps-
+
+      - name: Install Dependencies
+        shell: pwsh
+        run: |
+          pip install meson
+          choco install pkgconfiglite -y
+
+      - name: Download Windows Dependencies
+        shell: cmd
+        run: |
+          cd kodi-source\tools\buildsteps\windows\x64
+          call download-dependencies.bat
+          call download-msys2.bat
+
+      - name: Set up MSVC Developer Command Prompt
+        if: matrix.branch == 'Omega'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Build MinGW Libraries (FFmpeg) for Omega
+        if: matrix.branch == 'Omega'
+        shell: pwsh
+        run: |
+          $libPath = "kodi-source/project/BuildDependencies/mingwlibs/x64/lib/avcodec.lib"
+          if (Test-Path $libPath) {
+            Write-Host "FFmpeg libraries already found in cache. Skipping build."
+          } else {
+            Write-Host "FFmpeg libraries not found. Building..."
+            cd kodi-source\tools\buildsteps\windows
+            cmd /c "make-mingwlibs.bat sh noprompt build64"
+          }
+
+      - name: Patch FindFFMPEG.cmake (Omega only)
+        if: matrix.branch == 'Omega'
+        shell: pwsh
+        run: |
+          $filePath = "kodi-source/cmake/modules/FindFFMPEG.cmake"
+          $content = Get-Content $filePath -Raw
+          $content = $content.Replace('HINTS ${DEPENDS_PATH}/lib ${PC_FFMPEG_${libname}_LIBDIR}', 'HINTS ${DEPENDS_PATH}/lib ${MINGW_LIBS_DIR}/lib ${PC_FFMPEG_${libname}_LIBDIR}')
+          $content = $content.Replace('HINTS ${DEPENDS_PATH}/include', 'HINTS ${DEPENDS_PATH}/include ${MINGW_LIBS_DIR}/include')
+          Set-Content $filePath $content
+
+      - name: Configure and Build
+        shell: pwsh
+        run: |
+          mkdir build
+          $cmakeArgs = @(
+            "-S", "kodi-source",
+            "-B", "build",
+            "-G", "Visual Studio 17 2022",
+            "-A", "x64"
+          )
+          # Master branch: enable internal FFmpeg (uses MSYS2 build path)
+          # Omega branch: use pre-built FFmpeg from make-mingwlibs
+          if ("${{ matrix.branch }}" -eq "master") {
+            $cmakeArgs += "-DENABLE_INTERNAL_FFMPEG=ON"
+          } else {
+            $cmakeArgs += "-DENABLE_INTERNAL_FFMPEG=OFF"
+          }
+          cmake @cmakeArgs
+          cmake --build build --config Release -j $env:NUMBER_OF_PROCESSORS
+
+      - name: Create Standalone Zip
+        shell: pwsh
+        run: |
+          cmake --install build --prefix install_win --config Release
+          Compress-Archive -Path install_win\* -DestinationPath kodi-windows-${{ matrix.branch }}-standalone.zip
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-packages-${{ matrix.branch }}
+          path: |
+            build/Release/*.exe
+            build/Release/*.msi
+            *.zip
+
+  create-release:
+    name: Create GitHub Release (${{ matrix.branch }})
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: ['master', 'Omega']
+    steps:
+      - name: Checkout code (to get version.txt)
+        uses: actions/checkout@v4
+        with:
+          repository: xbmc/xbmc
+          ref: ${{ matrix.branch }}
+          path: kodi-source
+          fetch-depth: 1
+
+      - name: Download Linux Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-packages-${{ matrix.branch }}
+          path: linux-packages
+
+      - name: Download Windows Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-packages-${{ matrix.branch }}
+          path: windows-packages
+
+      - name: Get Version
+        id: get_version
+        run: |
+          VERSION=$(grep "VERSION_CODE" kodi-source/version.txt | awk '{print $2}')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}-${{ matrix.branch }}
+          name: Kodi Build ${{ steps.get_version.outputs.version }} (${{ matrix.branch }})
+          files: |
+            linux-packages/*.deb
+            linux-packages/*.rpm
+            linux-packages/*.tar.gz
+            windows-packages/*.zip
+            windows-packages/*.exe
+            windows-packages/*.msi
+          draft: false
+          prerelease: true
