@@ -2,7 +2,25 @@ services:
   revanced:
     image: imxeren/docker-py-revanced
     container_name: revanced-builder
+    pull_policy: always
+    depends_on:
+      display:
+        condition: service_healthy
+    environment:
+      - DISPLAY=display:0
     env_file:
       - .env
     volumes:
       - .:/app:z
+  display:
+    image: ghcr.io/imxeren/xvfb:main
+    restart: unless-stopped
+    environment:
+      - GEOMETRY=1920x1080x24
+      - DISPLAY=:0
+    healthcheck:
+      test: ["CMD-SHELL", "test -S /tmp/.X11-unix/X0"]
+      interval: 1s
+      timeout: 2s
+      retries: 10
+      start_period: 2s

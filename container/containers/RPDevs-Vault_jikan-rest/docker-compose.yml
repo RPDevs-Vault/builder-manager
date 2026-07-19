@@ -50,7 +50,7 @@ services:
     depends_on:
       mongodb: { condition: service_healthy }
       redis: { condition: service_healthy }
-      typesense: { condition: service_healthy }
+      typesense: { condition: service_started }
 
   mongodb:
     image: docker.io/mongo:focal
@@ -73,7 +73,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/db_admin_password
       MONGO_INITDB_DATABASE: jikan_admin
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://localhost:27017 --quiet
+      test: [ 'CMD-SHELL', 'mongosh mongodb://localhost:27017 --quiet --eval "db.runCommand(\"ping\").ok"' ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -94,7 +94,7 @@ services:
     ports:
       - '6379/tcp'
     healthcheck:
-      test: [ 'CMD', 'redis-cli', 'ping' ]
+      test: [ 'CMD-SHELL', 'redis-cli -a "$$(cat /run/secrets/redis_password)" ping | grep -q PONG' ]
       interval: 500ms
       timeout: 1s
 

@@ -1,29 +1,30 @@
-FROM python:3.11-alpine
+FROM ghcr.io/astral-sh/uv:python3.13-alpine
 LABEL name="Comet" \
       description="Stremio's fastest torrent/debrid search add-on." \
       url="https://github.com/g0ldyy/comet"
 
+RUN apk add --no-cache gcc python3-dev musl-dev linux-headers git make tzdata mimalloc2
+
 WORKDIR /app
 
-ARG DATABASE_PATH
+COPY pyproject.toml uv.lock ./
 
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    POETRY_NO_INTERACTION=1 \
-    POETRY_HOME="/usr/local" \
-    FORCE_COLOR=1 \
-    TERM=xterm-256color
+ENV TZ=UTC \
+    UV_HTTP_TIMEOUT=300 \
+    PYTHONMALLOC=malloc \
+    LD_PRELOAD=/usr/lib/libmimalloc.so.2
+ARG TARGETPLATFORM
+RUN --mount=type=cache,target=/root/.cache/uv,id=uv-${TARGETPLATFORM},sharing=locked uv sync --frozen
 
-# Fix python-alpine gcc
-RUN apk add --no-cache \
-    gcc \
-    musl-dev \
-    libffi-dev \
-    make
-
-RUN pip install poetry
-COPY pyproject.toml .
-RUN poetry install --no-cache --no-root --without dev
 COPY . .
 
-ENTRYPOINT ["poetry", "run", "python", "-m", "comet.main"]
+ARG DATABASE_PATH
+ARG COMET_COMMIT_HASH
+ARG COMET_BUILD_DATE
+ARG COMET_BRANCH
+
+ENV COMET_COMMIT_HASH=${COMET_COMMIT_HASH} \
+    COMET_BUILD_DATE=${COMET_BUILD_DATE} \
+    COMET_BRANCH=${COMET_BRANCH}
+
+ENTRYPOINT ["uv", "run", "python", "-m", "comet.main"]

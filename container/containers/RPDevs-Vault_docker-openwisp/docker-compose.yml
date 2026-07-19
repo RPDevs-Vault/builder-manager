@@ -7,17 +7,19 @@ x-celery-depends-on: &celery-depends-on
     dashboard:
       condition: service_started
     openvpn:
+      required: false
       condition: service_healthy
 
 services:
   dashboard:
-    image: openwisp/openwisp-dashboard:latest
+    image: openwisp/openwisp-dashboard:${OPENWISP_VERSION:-edge}
     restart: always
     build:
       context: images
       dockerfile: openwisp_dashboard/Dockerfile
       args:
         DASHBOARD_APP_PORT: 8000
+        OPENWISP_VERSION: ${OPENWISP_VERSION:-edge}
     env_file:
       - .env
     volumes:
@@ -27,6 +29,7 @@ services:
       - openwisp_ssh:/home/openwisp/.ssh
       - influxdb_data:/var/lib/influxdb
       - ./customization/configuration/django/:/opt/openwisp/openwisp/configuration:ro
+      - ./customization/theme:/opt/openwisp/static_custom:ro
     depends_on:
       - postgres
       - redis
@@ -34,13 +37,14 @@ services:
       - influxdb
 
   api:
-    image: openwisp/openwisp-api:latest
+    image: openwisp/openwisp-api:${OPENWISP_VERSION:-edge}
     restart: always
     build:
       context: images
       dockerfile: openwisp_api/Dockerfile
       args:
         API_APP_PORT: 8001
+        OPENWISP_VERSION: ${OPENWISP_VERSION:-edge}
     env_file:
       - .env
     volumes:
@@ -54,13 +58,14 @@ services:
       - dashboard
 
   websocket:
-    image: openwisp/openwisp-websocket:latest
+    image: openwisp/openwisp-websocket:${OPENWISP_VERSION:-edge}
     restart: always
     build:
       context: images
       dockerfile: openwisp_websocket/Dockerfile
       args:
         WEBSOCKET_APP_PORT: 8002
+        OPENWISP_VERSION: ${OPENWISP_VERSION:-edge}
     env_file:
       - .env
     volumes:
@@ -69,7 +74,7 @@ services:
       - dashboard
 
   celery:
-    image: openwisp/openwisp-dashboard:latest
+    image: openwisp/openwisp-dashboard:${OPENWISP_VERSION:-edge}
     restart: always
     environment:
       - MODULE_NAME=celery
@@ -81,10 +86,10 @@ services:
     env_file:
       - .env
     <<: *celery-depends-on
-    network_mode: "service:openvpn"
+    network_mode: "${CELERY_SERVICE_NETWORK_MODE-service:openvpn}"
 
   celery_monitoring:
-    image: openwisp/openwisp-dashboard:latest
+    image: openwisp/openwisp-dashboard:${OPENWISP_VERSION:-edge}
     restart: always
     environment:
       - MODULE_NAME=celery_monitoring
@@ -95,10 +100,10 @@ services:
     env_file:
       - .env
     <<: *celery-depends-on
-    network_mode: "service:openvpn"
+    network_mode: "${CELERY_SERVICE_NETWORK_MODE-service:openvpn}"
 
   celerybeat:
-    image: openwisp/openwisp-dashboard:latest
+    image: openwisp/openwisp-dashboard:${OPENWISP_VERSION:-edge}
     restart: always
     environment:
       - MODULE_NAME=celerybeat
@@ -112,7 +117,7 @@ services:
       - dashboard
 
   nginx:
-    image: openwisp/openwisp-nginx:latest
+    image: openwisp/openwisp-nginx:${OPENWISP_VERSION:-edge}
     restart: always
     build:
       context: images
@@ -124,22 +129,22 @@ services:
       - openwisp_media:/opt/openwisp/public/media:ro
       - openwisp_private_storage:/opt/openwisp/public/private:ro
       - openwisp_certs:/etc/letsencrypt
-      - ./customization/theme:/opt/openwisp/public/custom:ro
+      - ./customization/nginx:/opt/openwisp/public/custom:ro
     networks:
       default:
         aliases:
-         - dashboard.internal
-         - api.internal
+          - dashboard.internal
+          - api.internal
     ports:
-      - "80:80"
-      - "443:443"
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
     depends_on:
       - dashboard
       - api
       - websocket
 
   freeradius:
-    image: openwisp/openwisp-freeradius:latest
+    image: openwisp/openwisp-freeradius:${OPENWISP_VERSION:-edge}
     restart: always
     build:
       context: images
@@ -155,7 +160,7 @@ services:
       - dashboard
 
   postfix:
-    image: openwisp/openwisp-postfix:latest
+    image: openwisp/openwisp-postfix:${OPENWISP_VERSION:-edge}
     restart: always
     build:
       context: images
@@ -166,8 +171,8 @@ services:
       - openwisp_certs:/etc/ssl/mail
 
   openvpn:
-    image: openwisp/openwisp-openvpn:latest
-    restart: always
+    image: openwisp/openwisp-openvpn:${OPENWISP_VERSION:-edge}
+    restart: on-failure
     build:
       context: images
       dockerfile: openwisp_openvpn/Dockerfile

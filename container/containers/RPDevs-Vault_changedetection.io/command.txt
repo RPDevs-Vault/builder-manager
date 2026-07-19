@@ -1,0 +1,1 @@
+docker run -d --name RPDevs-Vault_changedetection.io ghcr.io/rpdevs-vault/rpdevs-vault_changedetection.io:latest
