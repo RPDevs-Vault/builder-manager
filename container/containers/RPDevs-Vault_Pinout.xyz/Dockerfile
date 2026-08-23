@@ -1,14 +1,15 @@
-FROM python:3.12.3-slim
+FROM python:slim
 
 ARG PUBLISH_DRAFT=''
 
-COPY . ./
+WORKDIR /app
 
-RUN apt-get update && \
-	apt-get install -y make
+COPY . .
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -e ".[serve,api]"
 
-RUN test -n ${PUBLISH_DRAFT} && ./draft/publish.sh ${PUBLISH_DRAFT}
+RUN if [ -n "${PUBLISH_DRAFT}" ]; then pinoutxyz boards publish "${PUBLISH_DRAFT}"; fi
 
-CMD ["bash", "-c", "make serve LANG=en"]
+EXPOSE 8080
+
+CMD ["sh", "-c", "pinoutxyz serve --watch --lang ${PINOUT_LANG:-en}"]
