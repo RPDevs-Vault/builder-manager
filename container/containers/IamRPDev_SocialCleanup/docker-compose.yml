@@ -1,0 +1,66 @@
+services:
+  socialcleanup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: socialcleanup:latest
+    container_name: socialcleanup-web
+    command: ["--host", "0.0.0.0", "--port", "5050"]
+    restart: unless-stopped
+    # Use host network mode for direct zero-overhead communication with host, Ollama, Qdrant, and n8n
+    network_mode: host
+    environment:
+      - PYTHONUNBUFFERED=1
+      - HOST=0.0.0.0
+      - PORT=5050
+      - OLLAMA_URL=http://127.0.0.1:11434
+      - QDRANT_URL=http://127.0.0.1:6333
+      - N8N_WEBHOOK_URL=http://127.0.0.1:5679/webhook/socialcleanup-events
+    env_file:
+      - .env
+    volumes:
+      # Persistent SQLite database, avatars, and encrypted sessions
+      - ./data:/app/data
+      # Automated database and JSON exports
+      - ./backups:/app/backups
+      # Secrets and environment configuration mounted read-only
+      - ./.env:/app/.env:ro
+      # Live code mounts for zero-downtime updates
+      - ./server.py:/app/server.py
+      - ./hub_data.py:/app/hub_data.py
+      - ./db.py:/app/db.py
+      - ./chat_engine.py:/app/chat_engine.py
+      - ./llm_engine.py:/app/llm_engine.py
+      - ./qdrant_memory.py:/app/qdrant_memory.py
+      - ./post_vision_engine.py:/app/post_vision_engine.py
+      - ./tpu_vision_engine.py:/app/tpu_vision_engine.py
+      - ./metadata_collector.py:/app/metadata_collector.py
+      - ./static:/app/static
+      - ./index.html:/app/index.html
+      - ./templates:/app/templates
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://127.0.0.1:5050/api/status || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: socialcleanup-n8n
+    restart: unless-stopped
+    environment:
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_WEBHOOK_URL=http://127.0.0.1:5679/
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_VERSION_NOTIFICATIONS_ENABLED=false
+      - EXECUTIONS_DATA_PRUNE=true
+      - EXECUTIONS_DATA_MAX_AGE=168
+      - GENERIC_TIMEZONE=America/New_York
+      - TZ=America/New_York
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+    ports:
+      - "127.0.0.1:5679:5678"
+    volumes:
+      - ./data/n8n:/home/node/.n8n

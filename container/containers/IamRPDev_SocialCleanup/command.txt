@@ -1,0 +1,1 @@
+docker run -d --name IamRPDev_SocialCleanup ghcr.io/rpdevs-vault/iamrpdev_socialcleanup:latest
